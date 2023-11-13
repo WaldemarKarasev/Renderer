@@ -1,14 +1,17 @@
 #include "nkpch.h"
 #include "Application.h"
 
-#include "Events/ApplicationEvent.h"
+
 #include "Log.h"
 
 namespace NK {
 
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
 	Application::Application()
 	{
 		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	}
 
 
@@ -16,29 +19,23 @@ namespace NK {
 	{
 	}
 
+	void Application::OnEvent(Event& e)
+	{
+		EventDispatcher dispatcher(e);
+
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
+
+		NK_CORE_INFO("{0}", e);
+	}
+
+	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	{
+		m_Running = false;
+		return true;
+	}
+
 	void Application::Run()
 	{
-		#if 0
-		WindowResizeEvent e(1280, 720);
-		if (e.IsInCategory(EventCategoryApplication))
-		{
-			NK_TRACE(e);
-		}
-		if (e.IsInCategory(EventCategoryInput))
-		{
-			NK_TRACE(e);
-		}
-		
-		size_t counter = 0;
-		while (true)
-		{
-			counter++;
-			if(counter % 10'000'000'000 == 0) {
-				NK_TRACE("Hello");
-			}
-		};
-		#endif
-
 		while (m_Running) 
 		{
 			m_Window->OnUpdate();
