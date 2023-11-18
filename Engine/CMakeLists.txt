@@ -5,6 +5,8 @@ project(NK)
 add_library(${PROJECT_NAME} SHARED 
     Nutckracker/Application.cpp
     Nutckracker/Log.cpp
+    Nutckracker/Layer.cpp
+    Nutckracker/LayerStack.cpp
     
     Platform/Linux/LinuxWindow.cpp
 )

@@ -10,8 +10,8 @@ namespace NK {
 
 	Application::Application()
 	{
-		m_Window = std::unique_ptr<Window>(Window::Create());
-		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window_ = std::unique_ptr<Window>(Window::Create());
+		m_Window_->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	}
 
 
@@ -25,21 +25,40 @@ namespace NK {
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
 
-		NK_CORE_INFO("{0}", e);
+		for (auto it = m_LayerStack_.end(); it != m_LayerStack_.begin();)
+		{
+			(*--it)->OnEvent(e);
+			if (e.Handled)
+				break;
+		}
+
+		//NK_CORE_INFO("{0}", e);
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		m_LayerStack_.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* overlay)
+	{
+		m_LayerStack_.PushOverlay(overlay);
 	}
 
 	bool Application::OnWindowClosed(WindowCloseEvent& e)
 	{
-		m_Running = false;
+		m_Running_ = false;
 		return true;
 	}
 
 	void Application::Run()
 	{
-		while (m_Running) 
+		while (m_Running_) 
 		{
-			m_Window->OnUpdate();
+			for (Layer* layer : m_LayerStack_)
+				layer->OnUpdate();
 
+			m_Window_->OnUpdate();
 		}
 	}
 
