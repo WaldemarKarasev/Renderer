@@ -7,9 +7,11 @@ SET (CMAKE_CXX_COMPILER "/usr/bin/clang++-14" CACHE STRING "C++ compiler" FORCE)
 project(Game_Engine)
 
 include_directories(${CMAKE_SOURCE_DIR}/Engine)
+include_directories(${CMAKE_SOURCE_DIR}/Engine/Nutckracker)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog/include)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/glfw/include)
-include_directories(${CMAKE_SOURCE_DIR}/Engine/Nutckracker)
+include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/glad/include)
+
 
 
 
