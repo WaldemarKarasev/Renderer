@@ -28,6 +28,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
+		PushLayer(new NK::ImGuiLayer());
 	}
 
 	~Sandbox()
