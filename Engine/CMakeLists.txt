@@ -22,6 +22,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/glfw)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/glad)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/imgui)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/glm)
 
 
 #target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/Engine/vendor/glfw/src)
@@ -31,6 +32,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE spdlog
     PRIVATE glad
     PRIVATE imgui
+    PRIVATE glm
 )
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC nkpch.h)

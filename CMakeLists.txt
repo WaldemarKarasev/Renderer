@@ -13,6 +13,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog/include)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/glfw/include)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/glad/include)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/imgui)
+include_directories(${CMAKE_SOURCE_DIR}/Engine/vendor/glm)
 
 
 

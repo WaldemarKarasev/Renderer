@@ -12,7 +12,7 @@ public:
 	void OnUpdate() override
 	{
 		//NK_INFO("ExampleLayer::Update");
-		if (NK::Input::IsKeyPressed(HZ_KEY_TAB))
+		if (NK::Input::IsKeyPressed(NK_KEY_TAB))
 			NK_TRACE("Tab key is pressed (poll)!");
 	}
 
@@ -22,7 +22,7 @@ public:
 		if (event.GetEventType() == NK::EventType::KeyPressed)
 		{
 			NK::KeyPressedEvent& e = (NK::KeyPressedEvent&)event;
-			if (e.GetKeyCode() == HZ_KEY_TAB)
+			if (e.GetKeyCode() == NK_KEY_TAB)
 				NK_TRACE("Tab key is pressed (event)!");
 			NK_TRACE("{0}", (char)e.GetKeyCode());
 		}
