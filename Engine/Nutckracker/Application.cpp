@@ -20,6 +20,9 @@ namespace NK {
 		
 		m_Window_ = std::unique_ptr<Window>(Window::Create());
 		m_Window_->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+		m_ImGuiLayer_ = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer_);
 	}
 
 
@@ -39,8 +42,6 @@ namespace NK {
 			if (e.Handled)
 				break;
 		}
-
-		//NK_CORE_INFO("{0}", e);
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -70,6 +71,11 @@ namespace NK {
 
 			for (Layer* layer : m_LayerStack_)
 				layer->OnUpdate();
+
+			m_ImGuiLayer_->Begin();
+			for (Layer* layer : m_LayerStack_)
+				layer->OnImGuiRender();
+			m_ImGuiLayer_->End();
 
 			m_Window_->OnUpdate();
 		}

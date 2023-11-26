@@ -1,5 +1,7 @@
 #include <Nutckracker.h>
 
+
+
 class ExampleLayer : public NK::Layer
 {
 public:
@@ -14,6 +16,13 @@ public:
 		//NK_INFO("ExampleLayer::Update");
 		if (NK::Input::IsKeyPressed(NK_KEY_TAB))
 			NK_TRACE("Tab key is pressed (poll)!");
+	}
+
+	virtual void OnImGuiRender() override
+	{
+		//ImGui::Begin("Test");
+		//ImGui::Text("Hello World");
+		//ImGui::End();
 	}
 
 	void OnEvent(NK::Event& event) override
@@ -37,7 +46,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushLayer(new NK::ImGuiLayer());
 	}
 
 	~Sandbox()

@@ -22,6 +22,6 @@ namespace NK {
 
     private:
         std::vector<Layer*> m_Layers_;
-        std::vector<Layer*>::iterator m_LayerInsert_;
+        unsigned int m_LayerInsertIndex = 0;
     };
 }

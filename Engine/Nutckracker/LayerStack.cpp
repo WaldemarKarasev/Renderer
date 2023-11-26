@@ -4,7 +4,6 @@
 namespace NK {
     LayerStack::LayerStack()
 	{
-		m_LayerInsert_ = m_Layers_.begin();
 	}
 
 	LayerStack::~LayerStack()
@@ -15,7 +14,8 @@ namespace NK {
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_LayerInsert_ = m_Layers_.emplace(m_LayerInsert_, layer);
+		m_Layers_.emplace(m_Layers_.begin() + m_LayerInsertIndex, layer);
+		m_LayerInsertIndex++;
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
@@ -29,7 +29,7 @@ namespace NK {
 		if (it != m_Layers_.end())
 		{
 			m_Layers_.erase(it);
-			m_LayerInsert_--;
+			m_LayerInsertIndex--;
 		}   
 	}
 
