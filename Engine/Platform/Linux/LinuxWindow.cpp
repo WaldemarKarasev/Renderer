@@ -17,20 +17,20 @@ namespace NK {
 
 	Window* Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return new LinuxWindow(props);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	LinuxWindow::LinuxWindow(const WindowProps& props)
 	{
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	LinuxWindow::~LinuxWindow()
 	{
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProps& props)
+	void LinuxWindow::Init(const WindowProps& props)
 	{
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
@@ -145,18 +145,18 @@ namespace NK {
 
 	}
 
-	void WindowsWindow::Shutdown()
+	void LinuxWindow::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
 	}
 
-	void WindowsWindow::OnUpdate()
+	void LinuxWindow::OnUpdate()
 	{
 		glfwPollEvents();
 		glfwSwapBuffers(m_Window);
 	}
 
-	void WindowsWindow::SetVSync(bool enabled)
+	void LinuxWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
 			glfwSwapInterval(1);
@@ -166,7 +166,7 @@ namespace NK {
 		m_Data.VSync = enabled;
 	}
 
-	bool WindowsWindow::IsVSync() const
+	bool LinuxWindow::IsVSync() const
 	{
 		return m_Data.VSync;
 	}

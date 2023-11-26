@@ -8,7 +8,6 @@
 #endif 
 
 
-//#define NK_ENABLE_ASSERT
 
 #if defined(NK_PLATFORM_WINDOWS)
 	#ifdef NK_BUILD_DLL

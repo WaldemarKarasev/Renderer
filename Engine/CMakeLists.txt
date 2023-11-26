@@ -9,6 +9,7 @@ add_library(${PROJECT_NAME} SHARED
     Nutckracker/LayerStack.cpp
     
     Platform/Linux/LinuxWindow.cpp
+    Platform/Linux/LinuxInput.cpp
 
     Nutckracker/ImGui/ImGuiLayer.cpp
 
