@@ -3,7 +3,9 @@
 
 #include <glad/glad.h>
 
-#include "Log.h"
+#include "Input.h"
+
+//#include "Log.h"
 
 namespace NK {
 
