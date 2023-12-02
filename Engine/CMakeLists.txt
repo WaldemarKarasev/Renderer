@@ -11,6 +11,8 @@ add_library(${PROJECT_NAME} SHARED
     Platform/Linux/LinuxWindow.cpp
     Platform/Linux/LinuxInput.cpp
 
+    Platform/OpenGL/OpenGLContext.cpp
+
     Nutckracker/ImGui/ImGuiLayer.cpp
 
     vendor/imgui/backends/imgui_impl_glfw.cpp 

@@ -1,7 +1,7 @@
 #pragma once
 
 #define NK_PLATFORM_LINUX
-//#define NK_DEBUG
+#define NK_DEBUG
 
 #ifdef NK_DEBUG
 	#define NK_ENABLE_ASSERT

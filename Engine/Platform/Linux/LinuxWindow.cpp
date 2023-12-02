@@ -5,6 +5,7 @@
 #include "Nutckracker/Events/KeyEvent.h"
 #include "Nutckracker/Events/MouseEvent.h"
 
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace NK {
 
@@ -49,15 +50,22 @@ namespace NK {
 			s_GLFWInitialized = true;
 		}
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		
+		#if 0
 		glfwMakeContextCurrent(m_Window);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		NK_CORE_ASSERT(status, "Failed to initialize Glad!");
-		glfwSetWindowUserPointer(m_Window, &m_Data);
+		#endif
+
+		m_context_ = new OpenGLContext(m_Window_);
+		m_context_->Init();
+
+		glfwSetWindowUserPointer(m_Window_, &m_Data);
 		SetVSync(true);
 
 		// Set GLFW callbacks
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height){
+		glfwSetWindowSizeCallback(m_Window_, [](GLFWwindow* window, int width, int height){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Width  = width;
 			data.Height = height;
@@ -67,13 +75,13 @@ namespace NK {
 			
 		});
 
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window){
+		glfwSetWindowCloseCallback(m_Window_, [](GLFWwindow* window){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			WindowCloseEvent event;
 			data.EventCallback(event);
 		});
 
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods){
+		glfwSetKeyCallback(m_Window_, [](GLFWwindow* window, int key, int scancode, int action, int mods){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			switch (action)
@@ -99,7 +107,7 @@ namespace NK {
 			}
 		});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
+		glfwSetCharCallback(m_Window_, [](GLFWwindow* window, unsigned int keycode)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -107,7 +115,7 @@ namespace NK {
 			data.EventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods){
+		glfwSetMouseButtonCallback(m_Window_, [](GLFWwindow* window, int button, int action, int mods){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			switch (action)
@@ -127,7 +135,7 @@ namespace NK {
 			}
 		});
 
-		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset){
+		glfwSetScrollCallback(m_Window_, [](GLFWwindow* window, double xOffset, double yOffset){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseScrolledEvent event((float)xOffset, (float)yOffset);
@@ -135,7 +143,7 @@ namespace NK {
 
 		});
 
-		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos){
+		glfwSetCursorPosCallback(m_Window_, [](GLFWwindow* window, double xPos, double yPos){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseMovedEvent event(xPos, yPos);
@@ -147,13 +155,14 @@ namespace NK {
 
 	void LinuxWindow::Shutdown()
 	{
-		glfwDestroyWindow(m_Window);
+		glfwDestroyWindow(m_Window_);
 	}
 
 	void LinuxWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		//glfwSwapBuffers(m_Window_);
+		m_context_->SwapBuffers();
 	}
 
 	void LinuxWindow::SetVSync(bool enabled)
