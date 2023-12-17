@@ -9,6 +9,10 @@
 #include "Nutckracker/ImGui/ImGuiLayer.h"
 #include "Nutckracker/LayerStack.h"
 
+#include "Nutckracker/Renderer/Shader.h"
+#include "Nutckracker/Renderer/VertexArray.h"
+
+
 #include "Window.h"
 
 
@@ -37,6 +41,12 @@ namespace NK {
 		ImGuiLayer* m_ImGuiLayer_;
 		bool m_Running_ = true;
 		LayerStack m_LayerStack_;
+
+		unsigned int m_VertexArray;
+		std::unique_ptr<Shader> m_Shader_;
+		std::unique_ptr<VertexBuffer> m_VertexBuffer;
+		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		
 	private:
 		static Application* s_Instance;
 	};

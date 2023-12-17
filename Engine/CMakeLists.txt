@@ -2,15 +2,20 @@ cmake_minimum_required(VERSION 3.20)
 
 project(NK)
 
-add_library(${PROJECT_NAME} SHARED 
+add_library(${PROJECT_NAME}  
     Nutckracker/Application.cpp
     Nutckracker/Log.cpp
     Nutckracker/Layer.cpp
     Nutckracker/LayerStack.cpp
+
+    Nutckracker/Renderer/VertexArray.cpp
+    Nutckracker/Renderer/Renderer.cpp
+    Nutckracker/Renderer/Shader.cpp
     
     Platform/Linux/LinuxWindow.cpp
     Platform/Linux/LinuxInput.cpp
 
+    Platform/OpenGL/OpenGLBuffer.cpp
     Platform/OpenGL/OpenGLContext.cpp
 
     Nutckracker/ImGui/ImGuiLayer.cpp

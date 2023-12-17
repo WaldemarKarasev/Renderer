@@ -28,11 +28,11 @@ namespace NK
 #define NK_CORE_INFO(...)  ::NK::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define NK_CORE_WARN(...)  ::NK::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define NK_CORE_ERROR(...) ::NK::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define NK_CORE_FATAL(...) ::NK::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+#define NK_CORE_FATAL(...) ::NK::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Client log macros
 #define NK_TRACE(...) ::NK::Log::GetClientLogger()->trace(__VA_ARGS__)
 #define NK_INFO(...)  ::NK::Log::GetClientLogger()->info(__VA_ARGS__)
 #define NK_WARN(...)  ::NK::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define NK_ERROR(...) ::NK::Log::GetClientLogger()->error(__VA_ARGS__)
-#define NK_FATAL(...) ::NK::Log::GetClientLogger()->fatal(__VA_ARGS__)
+#define NK_FATAL(...) ::NK::Log::GetClientLogger()->critical(__VA_ARGS__)
