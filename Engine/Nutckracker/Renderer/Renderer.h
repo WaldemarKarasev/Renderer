@@ -1,10 +1,12 @@
 #pragma once
 
-#include "RendererCommand.h"
+#include "Core.h"
+
+#include "RenderCommand.h"
 
 namespace NK {
 
-	class Renderer
+	class NK_API Renderer
 	{
 	public:
 		static void BeginScene();

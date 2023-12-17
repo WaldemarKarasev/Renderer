@@ -4,7 +4,7 @@
 
 namespace NK {
 
-	class LinuxInput : public Input
+	class GLFWInput : public Input
 	{
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) override;

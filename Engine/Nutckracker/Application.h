@@ -10,6 +10,7 @@
 #include "Nutckracker/LayerStack.h"
 
 #include "Nutckracker/Renderer/Shader.h"
+#include "Nutckracker/Renderer/Buffer.h"
 #include "Nutckracker/Renderer/VertexArray.h"
 
 
@@ -23,7 +24,7 @@ namespace NK {
 	{
 	public:
 		Application();
-		virtual ~Application();
+		virtual ~Application() = default;
 
 		void Run();
 
@@ -32,8 +33,10 @@ namespace NK {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
-		inline static Application& Get()  { return *s_Instance; }
+		inline static Application& Get()  { return *s_Instance_; }
+
 		inline Window& GetWindow() { return *m_Window_; }
+	
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
 
@@ -42,13 +45,14 @@ namespace NK {
 		bool m_Running_ = true;
 		LayerStack m_LayerStack_;
 
-		unsigned int m_VertexArray;
-		std::unique_ptr<Shader> m_Shader_;
-		std::unique_ptr<VertexBuffer> m_VertexBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		std::shared_ptr<Shader> m_Shader_;
+		std::shared_ptr<VertexArray> m_VertexArray_;
+
+		std::shared_ptr<Shader> m_BlueShader_;
+		std::shared_ptr<VertexArray> m_SquareVA_;
 		
 	private:
-		static Application* s_Instance;
+		static Application* s_Instance_;
 	};
 
 	// To be defined in CLIENT

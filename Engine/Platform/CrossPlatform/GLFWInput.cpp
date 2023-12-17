@@ -1,28 +1,28 @@
 #include "nkpch.h"
-#include "LinuxInput.h"
+#include "GLFWInput.h"
 
 #include "Nutckracker/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace NK {
 
-	Input* Input::s_Instance = new LinuxInput();
+	Input* Input::s_Instance = new GLFWInput();
 
-	bool LinuxInput::IsKeyPressedImpl(int keycode)
+	bool GLFWInput::IsKeyPressedImpl(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keycode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool LinuxInput::IsMouseButtonPressedImpl(int button)
+	bool GLFWInput::IsMouseButtonPressedImpl(int button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> LinuxInput::GetMousePositionImpl()
+	std::pair<float, float> GLFWInput::GetMousePositionImpl()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;
@@ -31,13 +31,13 @@ namespace NK {
 		return { (float)xpos, (float)ypos };
 	}
 
-	float LinuxInput::GetMouseXImpl()
+	float GLFWInput::GetMouseXImpl()
 	{
 		auto[x, y] = GetMousePositionImpl();
 		return x;
 	}
 
-	float LinuxInput::GetMouseYImpl()
+	float GLFWInput::GetMouseYImpl()
 	{
 		auto[x, y] = GetMousePositionImpl();
 		return y;

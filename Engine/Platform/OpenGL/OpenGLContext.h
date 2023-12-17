@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Core.h"
+
 #include "Nutckracker/Renderer/GraphicsContext.h"
 
-struct GLFWwindow;
+struct NK_API GLFWwindow;
 
 namespace NK {
 
@@ -14,7 +16,7 @@ namespace NK {
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 	private:
-		GLFWwindow* m_WindowHandle;
+		GLFWwindow* m_WindowHandle_;
 	};
 
 }

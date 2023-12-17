@@ -71,8 +71,8 @@ namespace NK {
 		// Vertex and fragment shaders are successfully compiled.
 		// Now time to link them together into a program.
 		// Get a program object.
-		m_RendererID = glCreateProgram();
-		GLuint program = m_RendererID;
+		m_RendererID_ = glCreateProgram();
+		GLuint program = m_RendererID_;
 
 		// Attach our shaders to our program
 		glAttachShader(program, vertexShader);
@@ -111,12 +111,12 @@ namespace NK {
 
 	Shader::~Shader()
 	{
-		glDeleteProgram(m_RendererID);
+		glDeleteProgram(m_RendererID_);
 	}
 
 	void Shader::Bind() const
 	{
-		glUseProgram(m_RendererID);
+		glUseProgram(m_RendererID_);
 	}
 
 	void Shader::Unbind() const

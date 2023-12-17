@@ -1,5 +1,5 @@
 #include "nkpch.h"
-#include "LinuxWindow.h"
+#include "GLFWWindow.h"
 
 #include "Nutckracker/Events/ApplicationEvent.h"
 #include "Nutckracker/Events/KeyEvent.h"
@@ -18,24 +18,24 @@ namespace NK {
 
 	Window* Window::Create(const WindowProps& props)
 	{
-		return new LinuxWindow(props);
+		return new GLFWWindow(props);
 	}
 
-	LinuxWindow::LinuxWindow(const WindowProps& props)
+	GLFWWindow::GLFWWindow(const WindowProps& props)
 	{
 		Init(props);
 	}
 
-	LinuxWindow::~LinuxWindow()
+	GLFWWindow::~GLFWWindow()
 	{
 		Shutdown();
 	}
 
-	void LinuxWindow::Init(const WindowProps& props)
+	void GLFWWindow::Init(const WindowProps& props)
 	{
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
+		m_Data_.Title = props.Title;
+		m_Data_.Width = props.Width;
+		m_Data_.Height = props.Height;
 
 		NK_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
@@ -50,18 +50,12 @@ namespace NK {
 			s_GLFWInitialized = true;
 		}
 
-		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data_.Title.c_str(), nullptr, nullptr);
 		
-		#if 0
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		NK_CORE_ASSERT(status, "Failed to initialize Glad!");
-		#endif
+		m_Context_ = new OpenGLContext(m_Window_);
+		m_Context_->Init();
 
-		m_context_ = new OpenGLContext(m_Window_);
-		m_context_->Init();
-
-		glfwSetWindowUserPointer(m_Window_, &m_Data);
+		glfwSetWindowUserPointer(m_Window_, &m_Data_);
 		SetVSync(true);
 
 		// Set GLFW callbacks
@@ -153,31 +147,30 @@ namespace NK {
 
 	}
 
-	void LinuxWindow::Shutdown()
+	void GLFWWindow::Shutdown()
 	{
 		glfwDestroyWindow(m_Window_);
 	}
 
-	void LinuxWindow::OnUpdate()
+	void GLFWWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		//glfwSwapBuffers(m_Window_);
-		m_context_->SwapBuffers();
+		m_Context_->SwapBuffers();
 	}
 
-	void LinuxWindow::SetVSync(bool enabled)
+	void GLFWWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
 			glfwSwapInterval(1);
 		else
 			glfwSwapInterval(0);
 
-		m_Data.VSync = enabled;
+		m_Data_.VSync = enabled;
 	}
 
-	bool LinuxWindow::IsVSync() const
+	bool GLFWWindow::IsVSync() const
 	{
-		return m_Data.VSync;
+		return m_Data_.VSync;
 	}
 
 }

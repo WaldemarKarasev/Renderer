@@ -3,6 +3,6 @@
 
 namespace NK {
 
-	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
+	RendererAPI::API RendererAPI::s_API_ = RendererAPI::API::OpenGL;
 
 }

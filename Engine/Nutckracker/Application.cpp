@@ -1,44 +1,21 @@
 #include "nkpch.h"
 #include "Application.h"
 
-//#include <glad/glad.h>
+#include <glad/glad.h>
 #include "Nutckracker/Renderer/Renderer.h"
 
 #include "Input.h"
-
-//#include "Log.h"
 
 namespace NK {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
-	Application* Application::s_Instance = nullptr;
-
-	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-		{
-			switch (type)
-			{
-				case NK::ShaderDataType::Float:    return GL_FLOAT;
-				case NK::ShaderDataType::Float2:   return GL_FLOAT;
-				case NK::ShaderDataType::Float3:   return GL_FLOAT;
-				case NK::ShaderDataType::Float4:   return GL_FLOAT;
-				case NK::ShaderDataType::Mat3:     return GL_FLOAT;
-				case NK::ShaderDataType::Mat4:     return GL_FLOAT;
-				case NK::ShaderDataType::Int:      return GL_INT;
-				case NK::ShaderDataType::Int2:     return GL_INT;
-				case NK::ShaderDataType::Int3:     return GL_INT;
-				case NK::ShaderDataType::Int4:     return GL_INT;
-				case NK::ShaderDataType::Bool:     return GL_BOOL;
-			}
-
-			NK_CORE_ASSERT(false, "Unknown ShaderDataType!");
-			return 0;
-		}
+	Application* Application::s_Instance_ = nullptr;
 
 	Application::Application()
 	{	
-		NK_CORE_ASSERT(!s_Instance, "Applicaiton already exists!");
-		s_Instance = this;
+		NK_CORE_ASSERT(!s_Instance_, "Applicaiton already exists!");
+		s_Instance_ = this;
 		
 		m_Window_ = std::unique_ptr<Window>(Window::Create());
 		m_Window_->SetEventCallback(BIND_EVENT_FN(OnEvent));
@@ -46,8 +23,7 @@ namespace NK {
 		m_ImGuiLayer_ = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer_);	
 
-		glGenVertexArrays(1, &m_VertexArray);
-		glBindVertexArray(m_VertexArray);
+		m_VertexArray_.reset(VertexArray::Create());
 
 		float vertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
@@ -55,35 +31,43 @@ namespace NK {
 			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
+		std::shared_ptr<VertexBuffer> vertexBuffer;
+		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-		
-		{
-			BufferLayout layout = {
-				{ ShaderDataType::Float3, "a_Position" },
-				{ ShaderDataType::Float4, "a_Color" }
-			};
-
-			m_VertexBuffer->SetLayout(layout);
-		}
-
-		uint32_t index = 0;
-		const auto& layout = m_VertexBuffer->GetLayout();
-		for (const auto& element : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
-				element.GetComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.Type),
-				element.Normalized ? GL_TRUE : GL_FALSE,
-				layout.GetStride(),
-				(const void*)element.Offset);
-			index++;
-		}
-
+		BufferLayout layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color" }
+		};
+		vertexBuffer->SetLayout(layout);
+		m_VertexArray_->AddVertexBuffer(vertexBuffer);
+	
 		uint32_t indices[3] = {0, 1, 2};
-		m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
+		std::shared_ptr<IndexBuffer> indexBuffer;
+		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		m_VertexArray_->SetIndexBuffer(indexBuffer);
 
+		m_SquareVA_.reset(VertexArray::Create());
+
+		float squareVertices[3 * 4] = {
+			-0.75f, -0.75f, 0.0f,
+			 0.75f, -0.75f, 0.0f,
+			 0.75f,  0.75f, 0.0f,
+			-0.75f,  0.75f, 0.0f
+		};
+
+		std::shared_ptr<VertexBuffer> squareVB;
+		squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		squareVB->SetLayout({
+			{ShaderDataType::Float3, "a_Position"}
+		});
+		m_SquareVA_->AddVertexBuffer(squareVB);
+
+		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
+		std::shared_ptr<IndexBuffer> squareIB;
+		squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		m_SquareVA_->SetIndexBuffer(squareIB);
+
+		
 		std::string vertexSrc = R"(
 			#version 330 core
 			
@@ -92,6 +76,7 @@ namespace NK {
 
 			out vec3 v_Position;
 			out vec4 v_Color;
+
 			void main()
 			{
 				v_Position = a_Position;
@@ -117,25 +102,35 @@ namespace NK {
 
 		m_Shader_.reset(new Shader(vertexSrc, fragmentSrc));
 
-	}
+		std::string blueShaderVertexSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) in vec3 a_Position;
 
+			out vec3 v_Position;
 
-	Application::~Application()
-	{
-	}
+			void main()
+			{
+				v_Position = a_Position;
+				gl_Position = vec4(a_Position, 1.0);	
+			}
+		)";
 
-	void Application::OnEvent(Event& e)
-	{
-		EventDisp	atcher dispatcher(e);
+		std::string blueShaderFragmentSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) out vec4 color;
 
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
+			in vec3 v_Position;
 
-		for (auto it = m_LayerStack_.end(); it != m_LayerStack_.begin();)
-		{
-			(*--it)->OnEvent(e);
-			if (e.Handled)
-				break;
-		}
+			void main()
+			{
+				color = vec4(0.2, 0.3, 0.8, 1.0);
+			}
+		)";
+
+		m_BlueShader_.reset(new Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
+
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -150,26 +145,35 @@ namespace NK {
 		overlay->OnAttach();
 	}
 
-	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	void Application::OnEvent(Event& e)
 	{
-		m_Running_ = false;
-		return true;
+		EventDispatcher dispatcher(e);
+
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
+
+		for (auto it = m_LayerStack_.end(); it != m_LayerStack_.begin();)
+		{
+			(*--it)->OnEvent(e);
+			if (e.Handled)
+				break;
+		}
 	}
 
 	void Application::Run()
 	{
 		while (m_Running_) 
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
 
-			RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1f});
+			RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.f});
 			RenderCommand::Clear();
 
 			Renderer::BeginScene();
 
-			Renderer::Submit(m_SquareVA);
-			Renderer::Submit(m_VertexArray);
+			//m_BlueShader_->Bind();
+			//Renderer::Submit(m_SquareVA_);
+
+			m_Shader_->Bind();
+			Renderer::Submit(m_VertexArray_);
 
 			Renderer::EndScene();
 
@@ -177,15 +181,18 @@ namespace NK {
 			for (Layer* layer : m_LayerStack_)
 				layer->OnUpdate();
 
-			m_ImGuiLayer_->Begin();
-			for (Layer* layer : m_LayerStack_)
-				layer->OnImGuiRender();
-			m_ImGuiLayer_->End();
-
-
+			//m_ImGuiLayer_->Begin();
+			//for (Layer* layer : m_LayerStack_)
+			//	layer->OnImGuiRender();
+			//m_ImGuiLayer_->End();
 
 			m_Window_->OnUpdate();
 		}
 	}
 
+	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	{
+		m_Running_ = false;
+		return true;
+	}
 }

@@ -10,30 +10,34 @@
 
 namespace NK {
 
-	class LinuxWindow : public Window
+	class GLFWWindow : public Window
 	{
 	public:
-		LinuxWindow(const WindowProps& props);
-		virtual ~LinuxWindow();
+		GLFWWindow(const WindowProps& props);
+		virtual ~GLFWWindow();
 
 		void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override { return m_Data.Width; }
-		inline unsigned int GetHeight() const override { return m_Data.Height; }
+		inline unsigned int GetWidth() const override { return m_Data_.Width; }
+		inline unsigned int GetHeight() const override { return m_Data_.Height; }
 
 		// Window attributes
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data_.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
 		inline virtual void* GetNativeWindow() const override { return m_Window_; }
 
+	// Backgound color will be public for a while. For testing purposes
+		float m_BackgroundColor_[4] = {1.f, 0.f, 0.f, 0.f};
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
+	
 	private:
 		GLFWwindow* m_Window_;
-		GraphicsContext* m_context_;
+		GraphicsContext* m_Context_;
+
 
 		struct WindowData
 		{
@@ -44,7 +48,7 @@ namespace NK {
 			EventCallbackFn EventCallback;
 		};
 
-		WindowData m_Data;
+		WindowData m_Data_;
 	};
 
 }

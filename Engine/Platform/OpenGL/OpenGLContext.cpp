@@ -7,14 +7,14 @@
 namespace NK {
 
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
-		: m_WindowHandle(windowHandle)
+		: m_WindowHandle_(windowHandle)
 	{
 		NK_CORE_ASSERT(windowHandle, "Window handle is null!")
 	}
 
 	void OpenGLContext::Init()
 	{
-		glfwMakeContextCurrent(m_WindowHandle);
+		glfwMakeContextCurrent(m_WindowHandle_);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		NK_CORE_ASSERT(status, "Failed to initialize Glad!");	
 
@@ -26,7 +26,7 @@ namespace NK {
 
 	void OpenGLContext::SwapBuffers()
 	{
-		glfwSwapBuffers(m_WindowHandle);
+		glfwSwapBuffers(m_WindowHandle_);
 	}
 
 }

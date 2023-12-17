@@ -1,5 +1,6 @@
 #pragma once
 
+// Global definitions for Engine
 #define NK_PLATFORM_LINUX
 #define NK_DEBUG
 
@@ -35,8 +36,8 @@
 
 
 #ifdef NK_ENABLE_ASSERT
-	#define NK_ASSERT(x, ...)	   {if(!x) { NK_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
-	#define NK_CORE_ASSERT(x, ...) {if(!x) { NK_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
+	#define NK_ASSERT(x, ...)	   {if(!(x)) { NK_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
+	#define NK_CORE_ASSERT(x, ...) {if(!(x)) { NK_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
 #else
 	#define NK_ASSERT(x, ...)	   
 	#define NK_CORE_ASSERT(x, ...)

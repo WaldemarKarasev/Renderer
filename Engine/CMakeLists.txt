@@ -4,24 +4,31 @@ project(NK)
 
 add_library(${PROJECT_NAME}  
     Nutckracker/Application.cpp
-    Nutckracker/Log.cpp
     Nutckracker/Layer.cpp
     Nutckracker/LayerStack.cpp
-
-    Nutckracker/Renderer/VertexArray.cpp
-    Nutckracker/Renderer/Renderer.cpp
-    Nutckracker/Renderer/Shader.cpp
-    
-    Platform/Linux/LinuxWindow.cpp
-    Platform/Linux/LinuxInput.cpp
-
-    Platform/OpenGL/OpenGLBuffer.cpp
-    Platform/OpenGL/OpenGLContext.cpp
+    Nutckracker/Log.cpp
 
     Nutckracker/ImGui/ImGuiLayer.cpp
-
     vendor/imgui/backends/imgui_impl_glfw.cpp 
     vendor/imgui/backends/imgui_impl_opengl3.cpp
+
+    Nutckracker/Renderer/Buffer.cpp
+    Nutckracker/Renderer/RenderCommand.cpp
+    Nutckracker/Renderer/RendererAPI.cpp
+    Nutckracker/Renderer/Renderer.cpp
+    Nutckracker/Renderer/Shader.cpp
+    Nutckracker/Renderer/VertexArray.cpp
+    
+    Platform/CrossPlatform/GLFWInput.cpp
+    Platform/CrossPlatform/GLFWWindow.cpp
+
+    
+    Platform/OpenGL/OpenGLBuffer.cpp
+    Platform/OpenGL/OpenGLContext.cpp
+    Platform/OpenGL/OpenGLRendererAPI.cpp
+    Platform/OpenGL/OpenGLVertexArray.cpp
+
+
 
 )
 
