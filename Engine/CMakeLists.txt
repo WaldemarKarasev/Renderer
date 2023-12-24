@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME}
     vendor/imgui/backends/imgui_impl_opengl3.cpp
 
     Nutckracker/Renderer/Buffer.cpp
+    Nutckracker/Renderer/Camera.cpp
     Nutckracker/Renderer/RenderCommand.cpp
     Nutckracker/Renderer/RendererAPI.cpp
     Nutckracker/Renderer/Renderer.cpp

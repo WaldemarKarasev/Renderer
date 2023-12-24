@@ -114,6 +114,27 @@ namespace NK {
 		glDeleteProgram(m_RendererID_);
 	}
 
+	Shader::Shader(Shader&& shader)
+	{
+		m_RendererID_ = shader.m_RendererID_;
+		m_IsCompiled_ = shader.m_IsCompiled_;
+
+		shader.m_RendererID_ = 0;
+		shader.m_IsCompiled_ = false;
+	}
+
+	Shader& Shader::operator=(Shader&& shader)
+	{
+		m_RendererID_ = shader.m_RendererID_;
+		m_IsCompiled_ = shader.m_IsCompiled_;
+
+		shader.m_RendererID_ = 0;
+		shader.m_IsCompiled_ = false;
+
+		return *this;
+
+	}
+
 	void Shader::Bind() const
 	{
 		glUseProgram(m_RendererID_);
@@ -122,6 +143,12 @@ namespace NK {
 	void Shader::Unbind() const
 	{
 		glUseProgram(0);
+	}
+
+
+	void Shader::SetMat4(const char* name, const glm::mat4& mat4) const
+	{
+		glUniformMatrix4fv(glGetUniformLocation(m_RendererID_, name), 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
 }

@@ -6,6 +6,9 @@
 #include "Nutckracker/Events/KeyEvent.h"
 #include "Nutckracker/Events/MouseEvent.h"
 
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
 namespace NK {
     class NK_API ImGuiLayer : public Layer
     {

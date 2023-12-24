@@ -4,6 +4,7 @@
     "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
     "files.associations": {
         "*.cpp": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iosfwd": "cpp"
     }
 }

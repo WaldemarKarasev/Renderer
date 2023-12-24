@@ -5,7 +5,7 @@
 //#include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-
+#include "glm/vec4.hpp"
 
 #include "Nutckracker/Application.h"
 
@@ -22,8 +22,10 @@ namespace NK {
 
     ImGuiLayer::~ImGuiLayer()
     {
-
-
+		if (ImGui::GetCurrentContext())
+		{
+			ImGui::DestroyContext();
+		}
     }
     
     void ImGuiLayer::OnAttach()
@@ -57,7 +59,7 @@ namespace NK {
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
-        
+
     }
     
     void ImGuiLayer::OnDetach()
@@ -96,8 +98,32 @@ namespace NK {
 
     void ImGuiLayer::OnImGuiRender()
     {
+		NK::Application& app = Application::Get();
+
         static bool show = true;
 		ImGui::ShowDemoWindow(&show);
+		
+
+		glm::vec4& color = Application::Get().GetBackgroundColor(); 
+		float color_vec[4] = {color.r, color.g, color.b, color.a}; 
+		
+		ImGui::ColorEdit4("Background Color", color_vec);
+
+		color.r = color_vec[0];
+		color.g = color_vec[1];
+		color.b = color_vec[2];
+		color.a = color_vec[3];
+
+		// Changing model matrix components
+		ImGui::SliderFloat3("Scale", app.GetScale(), 0.f, 2.f);
+		ImGui::SliderFloat("Rotate", app.GetRotation(), 0.0f, 360.0f);
+		ImGui::SliderFloat3("Translate", app.GetTranslation(), -1.0f, 1.0f);
+
+		// Changing view and projection matrices components
+		ImGui::SliderFloat3("camera position", app.GetCameraPosition(), -10.f, 10.f);
+        ImGui::SliderFloat3("camera rotation", app.GetCameraRotation(), 0, 360.f);
+        ImGui::Checkbox("Perspective camera", app.GetCameraMode());
+		
     }
     
     

@@ -9,7 +9,7 @@ namespace NK {
 	class NK_API OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer(float* vertices, uint32_t size);
+		OpenGLVertexBuffer(float* vertices, uint32_t size, const BufferUsage usage);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
@@ -26,7 +26,7 @@ namespace NK {
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
+		OpenGLIndexBuffer(uint32_t* indices, uint32_t count, const BufferUsage usage);
 		virtual ~OpenGLIndexBuffer();
 
 		virtual void Bind() const;

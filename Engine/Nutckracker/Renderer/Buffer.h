@@ -6,6 +6,13 @@
 
 namespace NK {
 
+	enum class BufferUsage // for vertex buffers. Need to implement into vertec buffer class
+	{
+		STATIC_USAGE,
+		DYNAMIC_USAGE,
+		STREAM_USAGE
+	};
+
 	enum class ShaderDataType
 	{
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
@@ -116,7 +123,7 @@ namespace NK {
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static VertexBuffer* Create(float* vertices, uint32_t size);
+		static VertexBuffer* Create(float* vertices, uint32_t size, const BufferUsage usage = BufferUsage::STATIC_USAGE);
 	};
 
 	class NK_API IndexBuffer
@@ -129,7 +136,7 @@ namespace NK {
 
 		virtual uint32_t GetCount() const = 0;
 
-		static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		static IndexBuffer* Create(uint32_t* indices, uint32_t size, const BufferUsage usage = BufferUsage::STATIC_USAGE);
 	};
 
 }

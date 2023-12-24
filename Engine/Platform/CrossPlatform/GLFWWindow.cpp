@@ -63,10 +63,15 @@ namespace NK {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Width  = width;
 			data.Height = height;
-
+			NK_TRACE("WindowSizeCallback: {0}, {1}", width, height);
 			WindowResizeEvent event(width, height);
-			data.EventCallback(event);
 			
+			data.EventCallback(event);
+		});
+
+		glfwSetFramebufferSizeCallback(m_Window_, [](GLFWwindow* window, int width, int height){
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			NK_TRACE("FramebufferSizeCallback: {0}, {1}", width, height);
 		});
 
 		glfwSetWindowCloseCallback(m_Window_, [](GLFWwindow* window){

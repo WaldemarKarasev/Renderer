@@ -5,15 +5,31 @@
 
 namespace NK {
 
+	static constexpr GLenum GetOpenGLBufferUsage(const BufferUsage usage)
+	{
+		switch (usage)
+		{
+		case BufferUsage::STATIC_USAGE: 	return GL_STATIC_DRAW;
+		case BufferUsage::DYNAMIC_USAGE:	return GL_DYNAMIC_DRAW;
+		case BufferUsage::STREAM_USAGE:		return GL_STREAM_DRAW;
+
+		default:
+			return GL_STATIC_DRAW;
+		}
+
+		NK_CORE_ERROR("Unkown BufferUsage type!");
+	}
+
 	/////////////////////////////////////////////////////////////////////////////
 	// VertexBuffer /////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size, const BufferUsage usage)
 	{
+
 		glCreateBuffers(1, &m_RendererID_);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID_);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, size, vertices, GetOpenGLBufferUsage(usage));
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
@@ -35,12 +51,12 @@ namespace NK {
 	// IndexBuffer //////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count, const BufferUsage usage)
 		: m_Count_(count)
 	{
 		glCreateBuffers(1, &m_RendererID_);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GetOpenGLBufferUsage(usage));
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()

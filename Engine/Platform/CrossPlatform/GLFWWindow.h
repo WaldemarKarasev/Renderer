@@ -28,8 +28,6 @@ namespace NK {
 
 		inline virtual void* GetNativeWindow() const override { return m_Window_; }
 
-	// Backgound color will be public for a while. For testing purposes
-		float m_BackgroundColor_[4] = {1.f, 0.f, 0.f, 0.f};
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();

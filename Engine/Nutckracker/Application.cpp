@@ -2,9 +2,13 @@
 #include "Application.h"
 
 #include <glad/glad.h>
+#include <glm/trigonometric.hpp>
+
 #include "Nutckracker/Renderer/Renderer.h"
 
 #include "Input.h"
+
+#include "Nutckracker/Log.h"
 
 namespace NK {
 
@@ -22,29 +26,6 @@ namespace NK {
 
 		m_ImGuiLayer_ = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer_);	
-
-		m_VertexArray_.reset(VertexArray::Create());
-
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-		};
-
-		std::shared_ptr<VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-		BufferLayout layout = {
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float4, "a_Color" }
-		};
-		vertexBuffer->SetLayout(layout);
-		m_VertexArray_->AddVertexBuffer(vertexBuffer);
-	
-		uint32_t indices[3] = {0, 1, 2};
-		std::shared_ptr<IndexBuffer> indexBuffer;
-		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-		m_VertexArray_->SetIndexBuffer(indexBuffer);
 
 		m_SquareVA_.reset(VertexArray::Create());
 
@@ -68,65 +49,28 @@ namespace NK {
 		m_SquareVA_->SetIndexBuffer(squareIB);
 
 		
-		std::string vertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec4 a_Color;
-
-			out vec3 v_Position;
-			out vec4 v_Color;
-
-			void main()
-			{
-				v_Position = a_Position;
-				v_Color = a_Color;
-				gl_Position = vec4(a_Position, 1.0);	
-			}
-		)";
-
-		std::string fragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-
-			in vec3 v_Position;
-			in vec4 v_Color;
-
-			void main()
-			{
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
-				color = v_Color;
-			}
-		)";
-
-		m_Shader_.reset(new Shader(vertexSrc, fragmentSrc));
+		
 
 		std::string blueShaderVertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
+			#version 460
+        	layout(location = 0) in vec3 vertex_position;
+        	uniform mat4 model_matrix;
+			uniform mat4 view_projection_matrix;
 
-			out vec3 v_Position;
-
-			void main()
-			{
-				v_Position = a_Position;
-				gl_Position = vec4(a_Position, 1.0);	
-			}
+        	out vec3 color;
+        	void main() {
+            	gl_Position = view_projection_matrix * model_matrix * vec4(vertex_position, 1.0);
+           }
 		)";
 
 		std::string blueShaderFragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
+			#version 460
+           	in vec3 color;
+           	out vec4 frag_color;
 
-			in vec3 v_Position;
-
-			void main()
-			{
-				color = vec4(0.2, 0.3, 0.8, 1.0);
-			}
+           	void main() {
+              	frag_color = vec4(vec4(0.2, 0.3, 0.8, 1.0));
+           }
 		)";
 
 		m_BlueShader_.reset(new Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
@@ -150,6 +94,8 @@ namespace NK {
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
+
 
 		for (auto it = m_LayerStack_.end(); it != m_LayerStack_.begin();)
 		{
@@ -157,34 +103,60 @@ namespace NK {
 			if (e.Handled)
 				break;
 		}
+		//NK_TRACE("{0}", e);
 	}
 
 	void Application::Run()
 	{
 		while (m_Running_) 
-		{
+		{			
+			RenderCommand::SetClearColor(m_BackgroundColor_);
 
-			RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.f});
 			RenderCommand::Clear();
 
-			Renderer::BeginScene();
+			Renderer::BeginScene(); // Empty implementation
 
-			//m_BlueShader_->Bind();
-			//Renderer::Submit(m_SquareVA_);
+			m_BlueShader_->Bind();
 
-			m_Shader_->Bind();
-			Renderer::Submit(m_VertexArray_);
+			// model matrix
+			glm::mat4 scale_matrix( scale[0], 0,        0,        0,
+									0,        scale[1], 0,        0,
+									0,        0,        scale[2], 0,
+									0,        0,        0,        1);
+
+        	float rotate_in_radians = glm::radians(rotate);
+        	glm::mat4 rotate_matrix( cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
+                                	-sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
+                                	 0,                      0,                      1, 0,
+                                	 0,                      0,                      0, 1);
+
+        	glm::mat4 translate_matrix(1,            0,            0,            0,
+                                   	   0,            1,            0,            0,
+                                   	   0,            0,            1,            0,
+                                   	   translate[0], translate[1], translate[2], 1);
+
+        	glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
+        	m_BlueShader_->SetMat4("model_matrix", model_matrix);
+
+			// camera matrices. view and projection
+			camera.SetPositionRotation(glm::vec3(camera_position[0], camera_position[1], camera_position[2]),
+                                     glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
+							         camera.SetPtojectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
+        	m_BlueShader_->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+
+			// drawing m_SquareVA_
+			Renderer::Submit(m_SquareVA_);
 
 			Renderer::EndScene();
 
-			m_Shader_->Bind();
+
 			for (Layer* layer : m_LayerStack_)
 				layer->OnUpdate();
 
-			//m_ImGuiLayer_->Begin();
-			//for (Layer* layer : m_LayerStack_)
-			//	layer->OnImGuiRender();
-			//m_ImGuiLayer_->End();
+			m_ImGuiLayer_->Begin();
+			for (Layer* layer : m_LayerStack_)
+				layer->OnImGuiRender();
+			m_ImGuiLayer_->End();
 
 			m_Window_->OnUpdate();
 		}
@@ -192,7 +164,15 @@ namespace NK {
 
 	bool Application::OnWindowClosed(WindowCloseEvent& e)
 	{
+		//NK_CORE_TRACE("Window closed callback");
 		m_Running_ = false;
+		return true;
+	}
+
+	bool Application::OnWindowResized(WindowResizeEvent& e)
+	{
+		//NK_CORE_TRACE("Window resized callback");
+		RenderCommand::SetViewPort(0, 0, e.GetWidth(), e.GetHeight());
 		return true;
 	}
 }
