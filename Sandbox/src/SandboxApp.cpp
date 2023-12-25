@@ -35,48 +35,77 @@ public:
 			if (e.GetKeyCode() == NK_KEY_TAB)
 				NK_TRACE("Tab key is pressed (event)!");
 
+			bool MoveCamera = false;
+			glm::vec3 MovementDelta = {0.0, 0.0, 0.0};
+			glm::vec3 RotationDelta = {0.0, 0.0, 0.0};
+
 			NK::Application& app = NK::Application::Get();
 			
 			if (NK::Input::IsKeyPressed(NK_KEY_W))
 			{
-				app.GetCameraPosition()[2] -= 0.01f;
+				MovementDelta.x += 0.1f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_S))
 			{
-				app.GetCameraPosition()[2] += 0.01f;
+				MovementDelta.x -= 0.1f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_A))
 			{
-				app.GetCameraPosition()[0] -= 0.01f;
+				MovementDelta.y -= 0.1f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_D))
 			{
-				app.GetCameraPosition()[0] += 0.01f;
+				MovementDelta.y += 0.1f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_E))
 			{
-				app.GetCameraPosition()[1] += 0.01f;
+				MovementDelta.z += 0.1f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_Q))
 			{
-				app.GetCameraPosition()[1] -= 0.01f;
+				MovementDelta.z -= 0.1f;
+				MoveCamera = true;
 			}
 
 			if (NK::Input::IsKeyPressed(NK_KEY_UP))
 			{
-				app.GetCameraRotation()[0] += 0.5f;
+				RotationDelta.y -= 1.f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_DOWN))
 			{
-				app.GetCameraRotation()[0] -= 0.5f;
+				RotationDelta.y += 1.f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_RIGHT))
 			{
-				app.GetCameraRotation()[1] -= 0.5f;
+				RotationDelta.z -= 1.f;
+				MoveCamera = true;
 			}
 			if (NK::Input::IsKeyPressed(NK_KEY_LEFT))
 			{
-				app.GetCameraRotation()[1] += 0.5f;
+				RotationDelta.z += 1.f;
+				MoveCamera = true;
+			}
+			if (NK::Input::IsKeyPressed(NK_KEY_P))
+			{
+				RotationDelta.x += 1.f;
+				MoveCamera = true;
+			}
+			if (NK::Input::IsKeyPressed(NK_KEY_O))
+			{
+				RotationDelta.x -= 1.f;
+				MoveCamera = true;
+			}
+
+			if (MoveCamera)
+			{
+				app.GetCamera()->AddMovementAndRotation(MovementDelta, RotationDelta);
 			}
 		}
 	}

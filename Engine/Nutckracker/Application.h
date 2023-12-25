@@ -48,6 +48,7 @@ namespace NK {
 		inline float* GetRotation() 	{ return &rotate; };
 		inline float* GetTranslation() 	{ return translate; };
 		// view and projection matrices
+		inline Camera* GetCamera() {return &camera;}
 		inline float* GetCameraPosition() { return camera_position; }
 		inline float* GetCameraRotation() { return camera_rotation; }
 		inline bool* GetCameraMode() 	  { return &perspective_camera; }
@@ -82,7 +83,7 @@ namespace NK {
 		float camera_position[3] = { 0.f, 0.f, 1.f };
     	float camera_rotation[3] = { 0.f, 0.f, 0.f };
     	bool perspective_camera = false;
-    	Camera camera;
+    	Camera camera{glm::vec3(-5., 0., 0.)};
 
 	private:
 		static Application* s_Instance_;

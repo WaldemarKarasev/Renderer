@@ -119,14 +119,25 @@ namespace NK {
 		ImGui::SliderFloat("Rotate", app.GetRotation(), 0.0f, 360.0f);
 		ImGui::SliderFloat3("Translate", app.GetTranslation(), -1.0f, 1.0f);
 
+		float camera_position[3], camera_rotation[3];
+		camera_position[0] = app.GetCamera()->GetCameraPosition().x;
+		camera_position[1] = app.GetCamera()->GetCameraPosition().y;
+		camera_position[2] = app.GetCamera()->GetCameraPosition().z;
+
+		camera_rotation[0] = app.GetCamera()->GetCameraRotation().x;
+		camera_rotation[1] = app.GetCamera()->GetCameraRotation().y;
+		camera_rotation[2] = app.GetCamera()->GetCameraRotation().z;
+
 		// Changing view and projection matrices components
-		ImGui::SliderFloat3("camera position", app.GetCameraPosition(), -10.f, 10.f);
-        ImGui::SliderFloat3("camera rotation", app.GetCameraRotation(), 0, 360.f);
-        ImGui::Checkbox("Perspective camera", app.GetCameraMode());
-		
+		if (ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f))
+        {
+            app.GetCamera()->SetPositon(glm::vec3(camera_position[0], camera_position[1], camera_position[2]));
+        }
+        if (ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f))
+        {
+            app.GetCamera()->SetRotation(glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
+        }
+
+		ImGui::Checkbox("Perspective camera", app.GetCameraMode());
     }
-    
-    
-    
-        
 }

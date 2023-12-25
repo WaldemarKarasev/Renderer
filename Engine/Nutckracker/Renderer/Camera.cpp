@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include <glm/trigonometric.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 namespace NK {
 
@@ -17,30 +18,28 @@ namespace NK {
 
     void Camera::UpdateViewMatrix()
     {
-        float rotate_in_radians_x = glm::radians(-m_Rotation_.x);
-        glm::mat4 rotate_matrix_x(1, 0, 0, 0,
-            0, cos(rotate_in_radians_x), sin(rotate_in_radians_x), 0,
-            0, -sin(rotate_in_radians_x), cos(rotate_in_radians_x), 0,
-            0, 0, 0, 1);
+        const float RollInRadians  = glm::radians(m_Rotation_.x);
+        const float PitchInRadians = glm::radians(m_Rotation_.y);
+        const float YawInRadians   = glm::radians(m_Rotation_.z);
 
-        float rotate_in_radians_y = glm::radians(-m_Rotation_.y);
-        glm::mat4 rotate_matrix_y(cos(rotate_in_radians_y), 0, -sin(rotate_in_radians_y), 0,
-            0, 1, 0, 0,
-            sin(rotate_in_radians_y), 0, cos(rotate_in_radians_y), 0,
-            0, 0, 0, 1);
+        const glm::mat3 RotateMatrix_X(1, 0, 0,
+            0, cos(RollInRadians), sin(RollInRadians),
+            0, -sin(RollInRadians), cos(RollInRadians));
 
-        float rotate_in_radians_z = glm::radians(-m_Rotation_.z);
-        glm::mat4 rotate_matrix(cos(rotate_in_radians_z), sin(rotate_in_radians_z), 0, 0,
-            -sin(rotate_in_radians_z), cos(rotate_in_radians_z), 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1);
+        const glm::mat3 RotateMatrix_Y(cos(PitchInRadians), 0, -sin(PitchInRadians),
+            0, 1, 0,
+            sin(PitchInRadians), 0, cos(PitchInRadians));
 
-        glm::mat4 translate_matrix(1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            -m_Position_[0], -m_Position_[1], -m_Position_[2], 1);
+        const glm::mat3 RotateMatrix_Z(cos(YawInRadians), sin(YawInRadians), 0,
+            -sin(YawInRadians), cos(YawInRadians), 0,
+            0, 0, 1);
 
-        m_ViewMatrix_ = rotate_matrix_y * rotate_matrix_x * translate_matrix;
+        const glm::mat3 EulerRotationMatrix = RotateMatrix_Z * RotateMatrix_Y * RotateMatrix_X;
+        m_Direction_ = glm::normalize(EulerRotationMatrix * s_WorldForward_);
+        m_Right_ = glm::normalize(EulerRotationMatrix * s_WorldRight_);
+        m_Up_ = glm::cross(m_Right_, m_Direction_);
+
+        m_ViewMatrix_ = glm::lookAt(m_Position_, m_Position_ + m_Direction_, m_Up_);
     }
 
     void Camera::UpdateProjectionMatrix()
@@ -92,5 +91,31 @@ namespace NK {
     {
         m_ProjectionMode_ = projection_mode;
         UpdateProjectionMatrix();
+    }
+
+    void Camera::MoveForward(const float delta)
+    {
+        m_Position_ += m_Direction_ * delta;
+        UpdateViewMatrix();
+    }
+    void Camera::MoveRight(const float delta)
+    {
+        m_Position_ += m_Right_ * delta;
+        UpdateViewMatrix();
+    }
+    void Camera::MoveUp(const float delta)
+    {
+        m_Position_ += m_Up_ * delta;
+        UpdateViewMatrix();
+    }
+
+    void Camera::AddMovementAndRotation(const glm::vec3& movement_delta,
+                                        const glm::vec3& rotation_delta)
+    {
+        m_Position_ += m_Direction_ * movement_delta.x;
+        m_Position_ += m_Right_     * movement_delta.y;
+        m_Position_ += m_Up_        * movement_delta.z;
+        m_Rotation_ += rotation_delta;
+        UpdateViewMatrix();                                                                                                                
     }
 }
