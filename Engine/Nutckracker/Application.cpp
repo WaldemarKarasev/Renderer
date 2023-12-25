@@ -31,9 +31,9 @@ namespace NK {
 
 		float squareVertices[3 * 4] = {
 			0.0f, -0.75f, -0.75f,
-			 0.0f, -0.75f, 0.75f,
-			 0.0f,  0.75f, 0.75f,
-			0.0f,  0.75f, -0.75f
+			0.0f,  0.75f, -0.75f,
+			0.0f,  0.75f, 0.75f,
+			0.0f, -0.75f, 0.75f
 			//0.0f, -0.75f, 0.75f,
 			//0.0f, 0.75f,  0.75f,
 			//0.0f, -0.75f, 0.75f,
@@ -47,7 +47,7 @@ namespace NK {
 		});
 		m_SquareVA_->AddVertexBuffer(squareVB);
 
-		uint32_t squareIndices[6] = { 0, 1, 2, 3, 2, 1 };
+		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		std::shared_ptr<IndexBuffer> squareIB;
 		squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA_->SetIndexBuffer(squareIB);
@@ -141,7 +141,6 @@ namespace NK {
 
         	glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
         	m_BlueShader_->SetMat4("model_matrix", model_matrix);
-			NK_TRACE("{0}", camera.GetCameraPosition().x);
 			// camera matrices. view and projection
 			//camera.SetPositionRotation(glm::vec3(camera_position[0], camera_position[1], camera_position[2]),
             //                         glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
