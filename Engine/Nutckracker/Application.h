@@ -11,6 +11,7 @@
 #include "Nutckracker/Renderer/Camera.h"
 #include "Nutckracker/Renderer/Buffer.h"
 #include "Nutckracker/Renderer/Shader.h"
+#include "Nutckracker/Renderer/Texture2D.h"
 #include "Nutckracker/Renderer/VertexArray.h"
 
 #include "glm/vec4.hpp"
@@ -84,6 +85,18 @@ namespace NK {
     	float camera_rotation[3] = { 0.f, 0.f, 0.f };
     	bool perspective_camera = false;
     	Camera camera{glm::vec3(-5., 0., 0.)};
+
+		// Textures
+		unsigned int m_TextureHandle_;
+		const unsigned int m_TextureWidth_ = 1000;
+		const unsigned int m_TextureHeight_ = 1000;
+		const unsigned int m_TextureChannels = 3;
+		int m_Frame_ = 0;
+		
+		std::shared_ptr<Texture2D> m_SmileTexture_;
+		std::shared_ptr<Texture2D> m_QuadsTexture_;
+		//Texture2D* m_SmileTexture_ = nullptr;
+		//Texture2D* m_QuadsTexture_ = nullptr;
 
 	private:
 		static Application* s_Instance_;

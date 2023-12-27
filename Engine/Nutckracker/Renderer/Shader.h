@@ -24,6 +24,7 @@ namespace NK {
 		bool IsCompiled() const { return m_IsCompiled_; }
 
 		void SetMat4(const char* name, const glm::mat4& mat4) const;
+		void SetInt(const char* name, const int value) const;
 	private:
 		uint32_t m_RendererID_;
 		bool m_IsCompiled_ = false;

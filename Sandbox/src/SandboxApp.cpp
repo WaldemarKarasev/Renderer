@@ -39,7 +39,7 @@ public:
 		glm::vec3 RotationDelta = {0.0, 0.0, 0.0};
 		if (event.GetEventType() == NK::EventType::KeyPressed)
 		{
-			NK_TRACE("KeyPressed event from Example Layer");
+			//NK_TRACE("KeyPressed event from Example Layer");
 			NK::KeyPressedEvent& e = (NK::KeyPressedEvent&)event;
 
 

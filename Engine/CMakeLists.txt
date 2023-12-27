@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME}
     Nutckracker/Renderer/RendererAPI.cpp
     Nutckracker/Renderer/Renderer.cpp
     Nutckracker/Renderer/Shader.cpp
+    Nutckracker/Renderer/Texture2D.cpp
     Nutckracker/Renderer/VertexArray.cpp
     
     Platform/CrossPlatform/GLFWInput.cpp

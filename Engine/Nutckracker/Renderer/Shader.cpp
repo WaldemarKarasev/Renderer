@@ -151,4 +151,8 @@ namespace NK {
 		glUniformMatrix4fv(glGetUniformLocation(m_RendererID_, name), 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
+	void Shader::SetInt(const char* name, const int value) const
+	{
+		glUniform1i(glGetUniformLocation(m_RendererID_, name), value);
+	}
 }

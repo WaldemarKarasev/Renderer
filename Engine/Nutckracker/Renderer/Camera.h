@@ -57,6 +57,7 @@ namespace NK {
         glm::mat4 m_ViewMatrix_;
         glm::mat4 m_ProjectionMatrix_;
 
+        bool m_UpdateViewMatrix_ = false;
     };
 
 }

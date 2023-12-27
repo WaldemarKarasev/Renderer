@@ -30,6 +30,16 @@ namespace NK_API NK {
 			s_RendererAPI_->Clear();
 		}
 
+		inline static void EnableDepthTest()
+		{
+			s_RendererAPI_->EnableDepthTest();
+		}
+
+		inline static void DisableDepthTest()
+		{
+			s_RendererAPI_->DisableDepthTest();
+		}
+
 		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 		{
 			s_RendererAPI_->DrawIndexed(vertexArray);
