@@ -49,7 +49,8 @@ namespace NK {
 
 			s_GLFWInitialized = true;
 		}
-
+		
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data_.Title.c_str(), nullptr, nullptr);
 		
 		m_Context_ = new OpenGLContext(m_Window_);
@@ -82,7 +83,7 @@ namespace NK {
 
 		glfwSetKeyCallback(m_Window_, [](GLFWwindow* window, int key, int scancode, int action, int mods){
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-
+			
 			switch (action)
 			{
 				case GLFW_PRESS:

@@ -99,6 +99,7 @@ namespace NK {
     void ImGuiLayer::OnImGuiRender()
     {
 		NK::Application& app = Application::Get();
+		NK::Camera* camera = app.GetCamera();
 
         static bool show = true;
 		ImGui::ShowDemoWindow(&show);
@@ -120,23 +121,49 @@ namespace NK {
 		ImGui::SliderFloat3("Translate", app.GetTranslation(), -1.0f, 1.0f);
 
 		float camera_position[3], camera_rotation[3];
-		camera_position[0] = app.GetCamera()->GetCameraPosition().x;
-		camera_position[1] = app.GetCamera()->GetCameraPosition().y;
-		camera_position[2] = app.GetCamera()->GetCameraPosition().z;
+		camera_position[0] = camera->GetCameraPosition().x;
+		camera_position[1] = camera->GetCameraPosition().y;
+		camera_position[2] = camera->GetCameraPosition().z;
 
-		camera_rotation[0] = app.GetCamera()->GetCameraRotation().x;
-		camera_rotation[1] = app.GetCamera()->GetCameraRotation().y;
-		camera_rotation[2] = app.GetCamera()->GetCameraRotation().z;
+		camera_rotation[0] = camera->GetCameraRotation().x;
+		camera_rotation[1] = camera->GetCameraRotation().y;
+		camera_rotation[2] = camera->GetCameraRotation().z;
 
 		// Changing view and projection matrices components
 		if (ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f))
         {
-            app.GetCamera()->SetPositon(glm::vec3(camera_position[0], camera_position[1], camera_position[2]));
+            camera->SetPositon(glm::vec3(camera_position[0], camera_position[1], camera_position[2]));
         }
         if (ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f))
         {
-            app.GetCamera()->SetRotation(glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
+            camera->SetRotation(glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
         }
+
+		float NearPlane = *camera->GetPtrToNearPlane();
+		if(ImGui::SliderFloat("Camera Near Plane", &NearPlane, 0.1f, 10.0f))
+		{
+			camera->SetNearPlane(NearPlane);
+		}
+		float FarPlane = *camera->GetPtrToFarPlane();
+		if(ImGui::SliderFloat("Camera Far Plane", &FarPlane, 1.f, 100.f))
+		{
+			camera->SetFarPlane(FarPlane);
+		}
+		float FOV = *camera->GetPtrToFOV();
+		if(ImGui::SliderFloat("Camera FOV", &FOV, 1.f, 120.f))
+		{
+			camera->SetFOV(FOV);
+		}
+		//float ViewPortWidth = *camera->GetPtrToViewPortWidth();
+		//if(ImGui::SliderFloat("Camera ViewPortWidth", &ViewPortWidth, 0.1f, 10.0f))
+		//{
+		//	camera->SetViewPortWidth(ViewPortWidth);
+		//}
+		//float ViewPortHeight = *camera->GetPtrToViewPortHeight();
+		//if(ImGui::SliderFloat("Camera ViewPortHeight", &ViewPortHeight, 0.1f, 10.0f))
+		//{
+		//	camera->SetViewPortHeight(ViewPortHeight);
+		//}
 
 		ImGui::Checkbox("Perspective camera", app.GetCameraMode());
     }

@@ -15,6 +15,9 @@ namespace NK {
 		virtual void DisableDepthTest() override;
 
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) override;
+
+		//const char* GLSourceToString(const GLenum source);
+		//const char* GLTtypeToString(const GLenum type);
 	};
 
 

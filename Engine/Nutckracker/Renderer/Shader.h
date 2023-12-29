@@ -25,6 +25,8 @@ namespace NK {
 
 		void SetMat4(const char* name, const glm::mat4& mat4) const;
 		void SetInt(const char* name, const int value) const;
+		void SetFloat(const char* name, const float value) const;
+		void SetVec3(const char* name, const glm::vec3 vec3) const;
 	private:
 		uint32_t m_RendererID_;
 		bool m_IsCompiled_ = false;

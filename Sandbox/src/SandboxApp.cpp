@@ -17,7 +17,7 @@ private:
 
 public:
 	ExampleLayer()
-		: Layer("Example")
+		: Layer("Editor Layer")
 	{
 
 	}

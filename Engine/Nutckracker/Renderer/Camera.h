@@ -43,12 +43,36 @@ namespace NK {
         void UpdateProjectionMatrix();
 
         glm::vec3 m_Position_;
-        glm::vec3 m_Rotation_; // X - Roll, Y - Pitch, Z - Yaw
-        ProjectionMode m_ProjectionMode_;
+        glm::vec3 m_Rotation_; // X - Roll, Y - Pitch, Z - Yaw  
+        ProjectionMode m_ProjectionMode_ = ProjectionMode::Perspective;
 
         glm::vec3 m_Direction_;
         glm::vec3 m_Right_;
         glm::vec3 m_Up_;
+
+        //--------------------Matrix parameters----------------------//
+        float m_FarClipPlane_{ 100.f };
+        float m_NearClipPlane_{ 0.1f };
+        float m_ViewPortWidth_{ 800.f };
+        float m_ViewPortHeigt_{ 600.f };
+        float m_FOV_{ 60.f };
+        public:
+        float* GetPtrToFarPlane()       { return &m_FarClipPlane_; }         
+        float* GetPtrToNearPlane()      { return &m_NearClipPlane_; }        
+        float* GetPtrToViewPortWidth()  { return &m_ViewPortWidth_; }    
+        float* GetPtrToViewPortHeight() { return &m_ViewPortHeigt_; }   
+        float* GetPtrToFOV()            { return &m_FOV_; }  
+
+        void SetFarPlane(float FarPlane);         
+        void SetNearPlane(float NearPlane);        
+        void SetViewPortWidth(float ViewPortWidth);    
+        void SetViewPortHeight(float ViewPortHeight);   
+        void SetFOV(float FOV);  
+        void SetViewPortSize(const float Width, const float Height);
+        //----------------------------------------------------------//
+
+        private:
+
 
         static constexpr glm::vec3 s_WorldUp_{ 0.f, 0.f, 1.f };
         static constexpr glm::vec3 s_WorldRight_{ 0.f, -1.f, 0.f };

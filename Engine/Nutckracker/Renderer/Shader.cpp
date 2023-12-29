@@ -155,4 +155,13 @@ namespace NK {
 	{
 		glUniform1i(glGetUniformLocation(m_RendererID_, name), value);
 	}
+
+	void Shader::SetFloat(const char* name, const float value) const
+	{
+		glUniform1f(glGetUniformLocation(m_RendererID_, name), value);
+	}
+	void Shader::SetVec3(const char* name, const glm::vec3 value) const
+	{
+		glUniform3f(glGetUniformLocation(m_RendererID_, name), value.x, value.y, value.z);
+	}
 }

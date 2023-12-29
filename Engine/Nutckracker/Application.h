@@ -63,9 +63,6 @@ namespace NK {
 		bool m_Running_ = true;
 		LayerStack m_LayerStack_;
 
-		std::shared_ptr<Shader> m_Shader_;
-		std::shared_ptr<VertexArray> m_VertexArray_;
-
 		std::shared_ptr<Shader> m_BlueShader_;
 		std::shared_ptr<VertexArray> m_SquareVA_;
 		
@@ -83,7 +80,7 @@ namespace NK {
 		// View and Projection matrices manipulation
 		float camera_position[3] = { 0.f, 0.f, 1.f };
     	float camera_rotation[3] = { 0.f, 0.f, 0.f };
-    	bool perspective_camera = false;
+    	bool perspective_camera = true;
     	Camera camera{glm::vec3(-5., 0., 0.)};
 
 		// Textures
@@ -97,6 +94,19 @@ namespace NK {
 		std::shared_ptr<Texture2D> m_QuadsTexture_;
 		//Texture2D* m_SmileTexture_ = nullptr;
 		//Texture2D* m_QuadsTexture_ = nullptr;
+
+		//----------Light Model-----------//
+		float light_source_position[3] = { 0.f, 0.f, 0.f };
+        float light_source_color[3] = { 1.f, 1.f, 1.f };
+        float ambient_factor = 0.1f;
+        float diffuse_factor = 1.0f;
+        float specular_factor = 0.5f;
+        float shininess = 32.f;
+
+		std::shared_ptr<Shader> m_LightSourceShader_;
+		std::shared_ptr<VertexArray> m_LightSourceIceCube_;
+		//std::shared_ptr<VertexArray> m_VertexArray_;
+		//--------------------------------//
 
 	private:
 		static Application* s_Instance_;
