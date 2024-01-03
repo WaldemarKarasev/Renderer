@@ -11,6 +11,8 @@
 
 #include "Nutckracker/Log.h"
 
+#include "Platform/OpenGL/OpenGLShader.h"
+
 
 // for testing texture generation
 #include "ApplicationTextures.h"
@@ -188,7 +190,7 @@ namespace NK {
            }
 		)";
 
-		m_BlueShader_.reset(new Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
+		m_BlueShader_.reset(NK::Shader::Create(blueShaderVertexSrc, blueShaderFragmentSrc));
 
 
     	std::string light_source_vertex_shader =
@@ -212,7 +214,7 @@ namespace NK {
     	       }
     	    )";
 
-		m_LightSourceShader_.reset(new Shader(light_source_vertex_shader, light_source_fragment_shader));
+		m_LightSourceShader_.reset(NK::Shader::Create(light_source_vertex_shader, light_source_fragment_shader));
 		
 
 
@@ -270,6 +272,7 @@ namespace NK {
 
 	void Application::Run()
 	{
+		RenderCommand::Init();
 		std::array<glm::vec3, 5> positions = {
 				glm::vec3(-2.f, -2.f, -4.f),
 				glm::vec3(-5.f,  0.f,  3.f),
@@ -306,18 +309,18 @@ namespace NK {
                                    	   translate[0], translate[1], translate[2], 1);
 
         	glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
-        	m_BlueShader_->SetMat4("model_matrix", model_matrix);
-			m_BlueShader_->SetInt("current_frame", m_Frame_++);
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("model_matrix", model_matrix);
+			std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetInt("current_frame", m_Frame_++);
 
 			camera.SetPtojectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-        	m_BlueShader_->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-			m_BlueShader_->SetVec3("camera_position", camera.GetCameraPosition());
-        	m_BlueShader_->SetVec3("light_position", glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]));
-        	m_BlueShader_->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
-        	m_BlueShader_->SetFloat("ambient_factor", ambient_factor);
-        	m_BlueShader_->SetFloat("diffuse_factor", diffuse_factor);
-        	m_BlueShader_->SetFloat("specular_factor", specular_factor);
-        	m_BlueShader_->SetFloat("shininess", shininess);
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+			std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("camera_position", camera.GetCameraPosition());
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("light_position", glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]));
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("ambient_factor", ambient_factor);
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("diffuse_factor", diffuse_factor);
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("specular_factor", specular_factor);
+        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("shininess", shininess);
 
 			// drawing m_SquareVA_
 			Renderer::Submit(m_SquareVA_);
@@ -330,20 +333,20 @@ namespace NK {
                     0, 0, 1, 0,
                     current_position[0], current_position[1], current_position[2], 1);
                 
-				m_BlueShader_->SetMat4("model_matrix", translate_matrix);
+				std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("model_matrix", translate_matrix);
                 Renderer::Submit(m_SquareVA_);
             }
 
 			// light source
         	{
             	m_LightSourceShader_->Bind();
-            	m_LightSourceShader_->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
             	glm::mat4 translate_matrix(1, 0, 0, 0,
             	    0, 1, 0, 0,
             	    0, 0, 1, 0,
             	    light_source_position[0], light_source_position[1], light_source_position[2], 1);
-            	m_LightSourceShader_->SetMat4("model_matrix", translate_matrix);
-            	m_LightSourceShader_->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
+            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetMat4("model_matrix", translate_matrix);
+            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
             	Renderer::Submit(m_LightSourceIceCube_);
         	}
 			Renderer::EndScene();

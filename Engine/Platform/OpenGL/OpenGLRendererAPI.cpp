@@ -43,10 +43,6 @@ const char* GLSourceToString(const GLenum source)
 	{
 		// TODO: implementation
 		NK_TRACE("OpenGL Contex initialized");
-		//LOG_INFO("  OpenGL Vendor: {0}", get_vendor_str());
-        //LOG_INFO("  OpenGL Renderer: {0}", get_renderer_str());
-        //LOG_INFO("  OpenGL Version: {0}", get_version_str());
-
         glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
@@ -59,7 +55,6 @@ const char* GLSourceToString(const GLenum source)
                                   const GLchar* message,
                                   const void* userParam)
         {
-            NK_TRACE("Debug Callback is called.");
             switch (severity)
             {
             case GL_DEBUG_SEVERITY_HIGH:

@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME}
     Platform/OpenGL/OpenGLBuffer.cpp
     Platform/OpenGL/OpenGLContext.cpp
     Platform/OpenGL/OpenGLRendererAPI.cpp
+    Platform/OpenGL/OpenGLShader.cpp
     Platform/OpenGL/OpenGLVertexArray.cpp
 
 
