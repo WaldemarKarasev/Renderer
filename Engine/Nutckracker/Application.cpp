@@ -190,7 +190,7 @@ namespace NK {
            }
 		)";
 
-		m_BlueShader_.reset(NK::Shader::Create(blueShaderVertexSrc, blueShaderFragmentSrc));
+		m_BlueShader_.reset(NK::Shader::Create("BlueShader", blueShaderVertexSrc, blueShaderFragmentSrc));
 
 
     	std::string light_source_vertex_shader =
@@ -214,7 +214,7 @@ namespace NK {
     	       }
     	    )";
 
-		m_LightSourceShader_.reset(NK::Shader::Create(light_source_vertex_shader, light_source_fragment_shader));
+		m_LightSourceShader_.reset(NK::Shader::Create("LightSourceShader", light_source_vertex_shader, light_source_fragment_shader));
 		
 
 

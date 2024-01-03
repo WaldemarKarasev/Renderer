@@ -12,12 +12,13 @@ namespace NK {
     {
     public:
         OpenGLShader(const std::string& filepath);
-        OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+        OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
         virtual ~OpenGLShader();
         
         OpenGLShader(OpenGLShader&& shader) noexcept;
         OpenGLShader& operator=(OpenGLShader&& shader) noexcept;
 
+        virtual const std::string& GetName() const override { return m_Name_;}
         virtual void Bind() const override;
         virtual void Unbind() const override;
 
@@ -33,5 +34,6 @@ namespace NK {
 
 	private:
 		uint32_t m_RendererID_;   
+        std::string m_Name_;
     };
 }
