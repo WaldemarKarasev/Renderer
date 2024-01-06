@@ -154,16 +154,19 @@ namespace NK {
 		{
 			camera->SetFOV(FOV);
 		}
-		//float ViewPortWidth = *camera->GetPtrToViewPortWidth();
-		//if(ImGui::SliderFloat("Camera ViewPortWidth", &ViewPortWidth, 0.1f, 10.0f))
-		//{
-		//	camera->SetViewPortWidth(ViewPortWidth);
-		//}
-		//float ViewPortHeight = *camera->GetPtrToViewPortHeight();
-		//if(ImGui::SliderFloat("Camera ViewPortHeight", &ViewPortHeight, 0.1f, 10.0f))
-		//{
-		//	camera->SetViewPortHeight(ViewPortHeight);
-		//}
+
+		float lightParams[4];
+		lightParams[0] = app.GetAmbient();
+		lightParams[1] = app.GetDiffuse();
+		lightParams[2] = app.GetSpecular();
+		lightParams[3] = app.GetShininess();
+		if (ImGui::SliderFloat4("Light Parameters", lightParams, 0, 10.f))
+        {
+			app.SetAmbient(lightParams[0]);
+			app.SetDiffuse(lightParams[1]);
+			app.SetSpecular(lightParams[2]);
+			app.SetShininess(lightParams[3]);
+        }
 
 		ImGui::Checkbox("Perspective camera", app.GetCameraMode());
     }

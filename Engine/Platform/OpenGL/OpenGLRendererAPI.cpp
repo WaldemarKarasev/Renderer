@@ -43,6 +43,7 @@ const char* GLSourceToString(const GLenum source)
 	{
 		// TODO: implementation
 		NK_TRACE("OpenGL Contex initialized");
+        #if 1
         glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
@@ -93,6 +94,7 @@ const char* GLSourceToString(const GLenum source)
                     message);
             }
         }, nullptr);
+        #endif
 	}
 
 	void OpenGLRendererAPI::SetViewPort(uint32_t x, uint32_t y, uint32_t width, uint32_t height)

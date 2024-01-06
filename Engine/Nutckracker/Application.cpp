@@ -12,7 +12,7 @@
 #include "Nutckracker/Log.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
-
+#include "Platform/OpenGL/OpenGLTexture.h"
 
 // for testing texture generation
 #include "ApplicationTextures.h"
@@ -123,65 +123,83 @@ namespace NK {
 		
 
 		std::string blueShaderVertexSrc = R"(
-			#version 460
+			#version 450
         	layout(location = 0) in vec3 vertex_position;
 			layout(location = 1) in vec3 vertex_normal;
 			layout(location = 2) in vec2 texture_coord;
 
-        	uniform mat4 model_matrix;
-			uniform mat4 view_projection_matrix;
-			uniform int current_frame;
+			layout(location = 0) out vec2 tex_coord_smile;
+           	layout(location = 1) out vec2 tex_coord_quads;
+			layout(location = 2) out vec3 frag_position;
+			layout(location = 3) out vec3 frag_normal;
 
-			//out vec3 color;
-			out vec2 tex_coord_smile;
-           	out vec2 tex_coord_quads;
-			out vec3 frag_position;
-			out vec3 frag_normal;
+			layout(std140, binding = 6) uniform CameraData
+			{
+				mat4 model_matrix;
+				mat4 view_projection_matrix;
+				int current_frame;
+			} u_data;
+
+			//mat4 model_matrix;
+			//uniform mat4 view_projection_matrix;
+			//uniform int current_frame;
+
         	void main() {
 				tex_coord_smile = texture_coord;
-				tex_coord_quads = texture_coord + vec2(current_frame / 1000.f, current_frame / 1000.f);
-				frag_normal = mat3(transpose(inverse(model_matrix))) * vertex_normal;
-				vec4 vertex_position_world = model_matrix * vec4(vertex_position, 1.0);
+				tex_coord_quads = texture_coord + vec2(u_data.current_frame / 1000.f, u_data.current_frame / 1000.f);
+				frag_normal = mat3(transpose(inverse(u_data.model_matrix))) * vertex_normal;
+				vec4 vertex_position_world = u_data.model_matrix * vec4(vertex_position, 1.0);
 				frag_position = vertex_position_world.xyz;
-				gl_Position = view_projection_matrix * vertex_position_world;
+				gl_Position = u_data.view_projection_matrix * vertex_position_world;
            }
 		)";
 
 		std::string blueShaderFragmentSrc = R"(
-			#version 460
+			#version 450
 			//in vec3 color;
-			in vec2 tex_coord_smile;
-    		in vec2 tex_coord_quads;
-			in vec3 frag_position;
-			in vec3 frag_normal;
+			layout(location = 0) in vec2 tex_coord_smile;
+    		layout(location = 1) in vec2 tex_coord_quads;
+			layout(location = 2) in vec3 frag_position;
+			layout(location = 3) in vec3 frag_normal;
 
-			layout (binding = 0) uniform sampler2D InTexture_Smile;
-        	layout (binding = 1) uniform sampler2D InTexture_Quads;
+			layout(binding = 0) uniform sampler2D InTexture_Smile;
+        	layout(binding = 1) uniform sampler2D InTexture_Quads;
 
-			uniform vec3 camera_position;
-            uniform vec3 light_position;
-            uniform vec3 light_color;
-            uniform float ambient_factor;
-            uniform float diffuse_factor;
-            uniform float specular_factor;
-            uniform float shininess;
+			layout(std140, binding = 7) uniform LightData
+			{
+				vec3 camera_position;
+				vec3 light_position;
+				vec3 light_color;
+				float ambient_factor;
+				float diffuse_factor;
+				float specular_factor;
+				float shininess;
+			}u_data;
 
-			out vec4 frag_color;
+			//uniform vec3 camera_position;
+            //uniform vec3 light_position;
+            //uniform vec3 light_color;
+            //uniform float ambient_factor;
+            //uniform float diffuse_factor;
+            //uniform float specular_factor;
+            //uniform float shininess;
+
+			layout(location = 0) out vec4 frag_color;
 
            	void main() {
               				
 				// ambient
-              	vec3 ambient = ambient_factor * light_color;
+              	vec3 ambient = u_data.ambient_factor * u_data.light_color;
 				// diffuse
               	vec3 normal = normalize(frag_normal);
-              	vec3 light_dir = normalize(light_position - frag_position);
-              	vec3 diffuse = diffuse_factor * light_color * max(dot(normal, light_dir), 0.0);
+              	vec3 light_dir = normalize(u_data.light_position - frag_position);
+              	vec3 diffuse = u_data.diffuse_factor * u_data.light_color * max(dot(normal, light_dir), 0.0);
 
 				// specular
-              	vec3 view_dir = normalize(camera_position - frag_position);
+              	vec3 view_dir = normalize(u_data.camera_position - frag_position);
               	vec3 reflect_dir = reflect(-light_dir, normal);
-              	float specular_value = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
-              	vec3 specular = specular_factor * specular_value * light_color;
+              	float specular_value = pow(max(dot(view_dir, reflect_dir), 0.0), u_data.shininess);
+              	vec3 specular = u_data.specular_factor * specular_value * u_data.light_color;
 
 				//frag_color = vec4(color, 1.0);
 				//frag_color = texture(InTexture_Smile, tex_coord_smile);// * texture(InTexture_Quads, tex_coord_quads);
@@ -190,56 +208,89 @@ namespace NK {
            }
 		)";
 
-		m_BlueShader_.reset(NK::Shader::Create("BlueShader", blueShaderVertexSrc, blueShaderFragmentSrc));
+		m_BlueShader_.reset(Shader::Create("BlueShader", blueShaderVertexSrc, blueShaderFragmentSrc));
 
 
     	std::string light_source_vertex_shader =
-        	R"(#version 460
+        	R"(#version 450
         	   layout(location = 0) in vec3 vertex_position;
         	   layout(location = 1) in vec3 vertex_normal;
         	   layout(location = 2) in vec2 texture_coord;
-        	   uniform mat4 model_matrix;
-        	   uniform mat4 view_projection_matrix;
+        	   
+			   layout(std140, binding = 8) uniform CamData
+			   {
+				  mat4 model_matrix;
+				  mat4 view_projection_matrix;
+			   }u_data;
+
+			   //uniform mat4 model_matrix;
+        	   //uniform mat4 view_projection_matrix;
         	   void main() {
-        	      gl_Position = view_projection_matrix * model_matrix * vec4(vertex_position * 0.1f, 1.0);
+        	      gl_Position = u_data.view_projection_matrix * u_data.model_matrix * vec4(vertex_position * 0.1f, 1.0);
         	   }
         	)";
 
     	std::string light_source_fragment_shader =
-    	    R"(#version 460
-    	       out vec4 frag_color;
-    	       uniform vec3 light_color;
+    	    R"(#version 450
+    	       layout(location = 0) out vec4 frag_color;
+			   layout(std140, binding = 9) uniform LightCol
+			   {
+				  vec3 light_color;
+			   } u_data;
+    	       //uniform vec3 light_color;
     	       void main() {
-    	          frag_color = vec4(light_color, 1.f);
+    	          frag_color = vec4(u_data.light_color, 1.f);
     	       }
     	    )";
 
-		m_LightSourceShader_.reset(NK::Shader::Create("LightSourceShader", light_source_vertex_shader, light_source_fragment_shader));
+		m_LightSourceShader_.reset(Shader::Create("LightSourceShader", light_source_vertex_shader, light_source_fragment_shader));
 		
-
-
-
-
-
-
-
-
-
-
-
+		
 		
 		unsigned char* data = new unsigned char[m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels];
 		
 		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
+		#if 0 
+		TextureSpecification TexSpec;
+		TexSpec.Width = m_TextureWidth_;
+		TexSpec.Height = m_TextureHeight_;
+		TexSpec.data = data;
+		m_SmileTexture_.reset(Texture2D::Create(TexSpec));
+		m_SmileTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
+		#else
 		m_SmileTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
+		#endif
 		m_SmileTexture_->Bind(0);
 		
-		generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
-		m_QuadsTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
-		m_QuadsTexture_->Bind(1);
+
+		//NK_CORE_TRACE("{0}, {1}, {2}", m_SmileTexture_->GetHeight(), m_SmileTexture_->GetWidth(), m_SmileTexture_->GetRendererID());
+
+
+
+		//generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
+		////m_QuadsTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
+		//TexSpec.data = data;
+		//m_QuadsTexture_.reset(Texture2D::Create(TexSpec));
+		////m_QuadsTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
+		//m_QuadsTexture_->Bind(1);
+		
+
 
 		delete[] data;
 
+		m_BlueCameraUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::BlueCameraData), 0));
+		m_BlueLightUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::BlueLightData), 1));
+
+
+
+		m_LightCameraDataUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::LightCameraData), 2));
+		m_LightColorUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::LightColor), 3));
+
+
+		m_BlueCameraUniformBuffer_->SetData(&m_BlueCameraData_, sizeof(tmp_detail::BlueCameraData));
+		m_BlueLightUniformBuffer_->SetData(&m_BlueLightData_, sizeof(tmp_detail::BlueLightData));
+		m_LightCameraDataUniformBuffer_->SetData(&m_LightCameraData_, sizeof(tmp_detail::LightCameraData));
+		m_LightColorUniformBuffer_->SetData(&m_LightColor_, sizeof(tmp_detail::LightColor));
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -309,19 +360,37 @@ namespace NK {
                                    	   translate[0], translate[1], translate[2], 1);
 
         	glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("model_matrix", model_matrix);
-			std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetInt("current_frame", m_Frame_++);
-
+        	
 			camera.SetPtojectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-			std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("camera_position", camera.GetCameraPosition());
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("light_position", glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]));
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("ambient_factor", ambient_factor);
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("diffuse_factor", diffuse_factor);
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("specular_factor", specular_factor);
-        	std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetFloat("shininess", shininess);
+			#if 0
+			m_BlueShader_->SetMat4("u_data.model_matrix", model_matrix);
+			m_BlueShader_->SetInt("u_data.current_frame", m_Frame_++);
 
+        	m_BlueShader_->SetMat4( "u_data.view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+			m_BlueShader_->SetVec3( "u_data.camera_position", camera.GetCameraPosition());
+        	m_BlueShader_->SetVec3( "u_data.light_position", glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]));
+        	m_BlueShader_->SetVec3( "u_data.light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
+        	m_BlueShader_->SetFloat("u_data.ambient_factor", ambient_factor);
+        	m_BlueShader_->SetFloat("u_data.diffuse_factor", diffuse_factor);
+        	m_BlueShader_->SetFloat("u_data.specular_factor", specular_factor);
+        	m_BlueShader_->SetFloat("u_data.shininess", shininess);
+			#else
+			m_BlueCameraData_.current_frame++;
+			m_BlueCameraData_.model_matrix = model_matrix;
+			m_BlueCameraData_.view_projection_matrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+
+			m_BlueLightData_.camera_position = camera.GetCameraPosition();
+			m_BlueLightData_.light_position = glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]);
+			m_BlueLightData_.light_color = glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]);
+			m_BlueLightData_.ambient_factor = ambient_factor;
+			m_BlueLightData_.diffuse_factor = diffuse_factor;
+			m_BlueLightData_.specular_factor = specular_factor;
+			m_BlueLightData_.shininess = shininess;
+			
+			m_BlueCameraUniformBuffer_->SetData(&m_BlueCameraData_, sizeof(tmp_detail::BlueCameraData));
+			m_BlueLightUniformBuffer_->SetData(&m_BlueLightData_, sizeof(tmp_detail::BlueLightData));
+			#endif
+			
 			// drawing m_SquareVA_
 			Renderer::Submit(m_SquareVA_);
 			
@@ -332,22 +401,39 @@ namespace NK {
                     0, 1, 0, 0,
                     0, 0, 1, 0,
                     current_position[0], current_position[1], current_position[2], 1);
-                
-				std::dynamic_pointer_cast<OpenGLShader>(m_BlueShader_)->SetMat4("model_matrix", translate_matrix);
+				#if 0
+				m_BlueShader_->SetMat4("u_data.model_matrix", translate_matrix);
+				#else
+				m_BlueCameraData_.model_matrix = translate_matrix;
+				m_BlueCameraUniformBuffer_->SetData(&m_BlueCameraData_, sizeof(tmp_detail::BlueCameraData));
+				#endif
+
                 Renderer::Submit(m_SquareVA_);
             }
-
+			
 			// light source
         	{
             	m_LightSourceShader_->Bind();
-            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetMat4("view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-            	glm::mat4 translate_matrix(1, 0, 0, 0,
+				#if 0
+            	m_LightSourceShader_->SetMat4("u_data.view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+            	#else
+				m_LightCameraData_.view_projection_matrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+				m_LightCameraDataUniformBuffer_->SetData(&m_LightCameraData_, sizeof(tmp_detail::LightCameraData));
+				#endif
+				glm::mat4 translate_matrix(1, 0, 0, 0,
             	    0, 1, 0, 0,
             	    0, 0, 1, 0,
             	    light_source_position[0], light_source_position[1], light_source_position[2], 1);
-            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetMat4("model_matrix", translate_matrix);
-            	std::dynamic_pointer_cast<OpenGLShader>(m_LightSourceShader_)->SetVec3("light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
-            	Renderer::Submit(m_LightSourceIceCube_);
+            	#if 0
+				m_LightSourceShader_->SetMat4("u_data.model_matrix", translate_matrix);
+            	m_LightSourceShader_->SetVec3("u_data.light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
+            	#else
+				m_LightCameraData_.model_matrix = translate_matrix;
+				m_LightColor_.light_color = glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]);
+				m_LightCameraDataUniformBuffer_->SetData(&m_LightCameraData_, sizeof(tmp_detail::LightCameraData));
+				m_LightColorUniformBuffer_->SetData(&m_LightColor_, sizeof(tmp_detail::LightColor));
+				#endif
+				Renderer::Submit(m_LightSourceIceCube_);
         	}
 			Renderer::EndScene();
 

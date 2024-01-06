@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_map>
 
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+
 #include "Nutckracker/Core.h"
 
 namespace NK {
@@ -19,6 +22,12 @@ namespace NK {
 		static Shader* Create(const std::string& filepath);
 		static Shader* Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		
+		virtual void SetInt(const char* name, const int value) const = 0;
+		virtual void SetFloat(const char* name, const float value) const = 0;
+		virtual void SetVec2(const char* name, const glm::vec2& vec2) const = 0;
+		virtual void SetVec3(const char* name, const glm::vec3& vec3) const = 0;
+		virtual void SetVec4(const char* name, const glm::vec4& vec4) const = 0;
+		virtual void SetMat4(const char* name, const glm::mat4& mat4) const = 0;
 	};
 
 	class ShaderLibrary

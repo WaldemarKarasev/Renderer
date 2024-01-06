@@ -11,7 +11,8 @@
 #include "Nutckracker/Renderer/Camera.h"
 #include "Nutckracker/Renderer/Buffer.h"
 #include "Nutckracker/Renderer/Shader.h"
-#include "Nutckracker/Renderer/Texture2D.h"
+#include "Nutckracker/Renderer/Texture.h"
+#include "Nutckracker/Renderer/UniformBuffer.h"
 #include "Nutckracker/Renderer/VertexArray.h"
 
 #include "glm/vec4.hpp"
@@ -23,6 +24,42 @@
 
 
 namespace NK {
+
+namespace tmp_detail {
+	// for blueShader ubo's
+	struct BlueCameraData
+	{
+		glm::mat4 model_matrix;
+		glm::mat4 view_projection_matrix;
+		int current_frame;
+	};
+
+	struct BlueLightData 
+	{
+		glm::vec3 camera_position;
+		float padding0;
+		glm::vec3 light_position;
+		float padding1;
+		glm::vec3 light_color;
+		//float c; 
+		float ambient_factor = 0.1f;
+		float diffuse_factor = 1.0f;
+		float specular_factor = 0.5f;
+		float shininess = 32.f;
+	};
+
+	// for lightShader ubo's
+	struct LightCameraData
+	{
+		glm::mat4 model_matrix;
+		glm::mat4 view_projection_matrix;
+	};
+
+	struct LightColor
+	{
+		glm::vec3 light_color;
+	};	
+	}
 
 	class NK_API Application
 	{
@@ -65,10 +102,13 @@ namespace NK {
 
 		std::shared_ptr<Shader> m_BlueShader_;
 		std::shared_ptr<VertexArray> m_SquareVA_;
-		
+		tmp_detail::BlueCameraData m_BlueCameraData_{};
+		tmp_detail::BlueLightData m_BlueLightData_{};
+		std::shared_ptr<UniformBuffer> m_BlueCameraUniformBuffer_;
+		std::shared_ptr<UniformBuffer> m_BlueLightUniformBuffer_;
 	private:
 		// Temporaty members for testing simple transformation of rendered objects and gui manipulations at runtime
-
+	
 		// Changing background colors
 		glm::vec4 m_BackgroundColor_ = {0.2f, 0.2f, 0.2f, 0.f};
 
@@ -92,19 +132,30 @@ namespace NK {
 		
 		std::shared_ptr<Texture2D> m_SmileTexture_;
 		std::shared_ptr<Texture2D> m_QuadsTexture_;
-		//Texture2D* m_SmileTexture_ = nullptr;
-		//Texture2D* m_QuadsTexture_ = nullptr;
 
 		//----------Light Model-----------//
-		float light_source_position[3] = { 0.f, 0.f, 0.f };
+		float light_source_position[3] = { 0.f, 2.f, 0.f };
         float light_source_color[3] = { 1.f, 1.f, 1.f };
         float ambient_factor = 0.1f;
         float diffuse_factor = 1.0f;
         float specular_factor = 0.5f;
         float shininess = 32.f;
-
+	public:
+		float GetAmbient() { return ambient_factor; }
+		float GetDiffuse() { return diffuse_factor; }
+		float GetSpecular() { return specular_factor; }
+		float GetShininess() { return shininess; }
+		void SetAmbient(float value) { ambient_factor = value; }
+		void SetDiffuse(float value) { diffuse_factor = value; }
+		void SetSpecular(float value) { specular_factor = value; }
+		void SetShininess(float value) { shininess = value; }
+	private:
 		std::shared_ptr<Shader> m_LightSourceShader_;
 		std::shared_ptr<VertexArray> m_LightSourceIceCube_;
+		tmp_detail::LightCameraData m_LightCameraData_{};
+		tmp_detail::LightColor m_LightColor_{};
+		std::shared_ptr<UniformBuffer> m_LightCameraDataUniformBuffer_;
+		std::shared_ptr<UniformBuffer> m_LightColorUniformBuffer_;
 		//std::shared_ptr<VertexArray> m_VertexArray_;
 		//--------------------------------//
 

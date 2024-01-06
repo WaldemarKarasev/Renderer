@@ -1,11 +1,34 @@
-#include "Texture2D.h"
+#include "Texture.h"
 
-#include <algorithm>
-#include <cmath>
-#include <glad/glad.h>
-#include "nkpch.h"
+#include "Renderer.h"
+#include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace NK {
+    #if 0
+    Texture2D* Texture2D::Create(const TextureSpecification& specification)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::None:    NK_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return new OpenGLTexture2D(specification);
+		}
+
+		NK_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Texture2D* Texture2D::Create(const std::string& filepath)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::None:    NK_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return new OpenGLTexture2D(filepath);
+		}
+
+		NK_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+    #else
         Texture2D::Texture2D(const unsigned char* data, const unsigned int width, const unsigned int height)
         : m_Width_(width), m_Height_(height)
         {
@@ -18,6 +41,7 @@ namespace NK {
             glTextureParameteri(m_Id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTextureParameteri(m_Id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glGenerateTextureMipmap(m_Id_);
+            NK_CORE_TRACE("strlen(data)============", strlen((const char*)data));
         }
 
         Texture2D::~Texture2D()
@@ -50,4 +74,5 @@ namespace NK {
             //NK_TRACE("Texture2D::Bind(): {0}, {1}", unit, m_Id_);
             glBindTextureUnit(unit, m_Id_);
         }
+        #endif
 }
