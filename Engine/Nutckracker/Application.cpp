@@ -11,9 +11,6 @@
 
 #include "Nutckracker/Log.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
-
 // for testing texture generation
 #include "ApplicationTextures.h"
 
@@ -133,7 +130,7 @@ namespace NK {
 			layout(location = 2) out vec3 frag_position;
 			layout(location = 3) out vec3 frag_normal;
 
-			layout(std140, binding = 6) uniform CameraData
+			layout(std140, binding = 0) uniform CameraData
 			{
 				mat4 model_matrix;
 				mat4 view_projection_matrix;
@@ -165,7 +162,7 @@ namespace NK {
 			layout(binding = 0) uniform sampler2D InTexture_Smile;
         	layout(binding = 1) uniform sampler2D InTexture_Quads;
 
-			layout(std140, binding = 7) uniform LightData
+			layout(std140, binding = 1) uniform LightData
 			{
 				vec3 camera_position;
 				vec3 light_position;
@@ -217,7 +214,7 @@ namespace NK {
         	   layout(location = 1) in vec3 vertex_normal;
         	   layout(location = 2) in vec2 texture_coord;
         	   
-			   layout(std140, binding = 8) uniform CamData
+			   layout(std140, binding = 2) uniform CamData
 			   {
 				  mat4 model_matrix;
 				  mat4 view_projection_matrix;
@@ -233,7 +230,7 @@ namespace NK {
     	std::string light_source_fragment_shader =
     	    R"(#version 450
     	       layout(location = 0) out vec4 frag_color;
-			   layout(std140, binding = 9) uniform LightCol
+			   layout(std140, binding = 3) uniform LightCol
 			   {
 				  vec3 light_color;
 			   } u_data;
@@ -246,38 +243,28 @@ namespace NK {
 		m_LightSourceShader_.reset(Shader::Create("LightSourceShader", light_source_vertex_shader, light_source_fragment_shader));
 		
 		
-		
+		//Texture initialization
 		unsigned char* data = new unsigned char[m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels];
 		
-		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
-		#if 1 
 		TextureSpecification TexSpec;
 		TexSpec.Width = m_TextureWidth_;
 		TexSpec.Height = m_TextureHeight_;
+		TexSpec.GenerateMips = true;
 		TexSpec.data = data;
+		
+		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
 		m_SmileTexture_.reset(Texture2D::Create(TexSpec));
 		m_SmileTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
-		#else
-		m_SmileTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
-		#endif
 		m_SmileTexture_->Bind(0);
 		
-
-		//NK_CORE_TRACE("{0}, {1}, {2}", m_SmileTexture_->GetHeight(), m_SmileTexture_->GetWidth(), m_SmileTexture_->GetRendererID());
-
-
-
-		//generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
-		////m_QuadsTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
-		//TexSpec.data = data;
-		//m_QuadsTexture_.reset(Texture2D::Create(TexSpec));
-		////m_QuadsTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
-		//m_QuadsTexture_->Bind(1);
+		generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
+		m_QuadsTexture_.reset(Texture2D::Create(TexSpec));
+		m_QuadsTexture_->Bind(1);
 		
-
-
 		delete[] data;
 
+
+		// UniformBuffers initialization
 		m_BlueCameraUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::BlueCameraData), 0));
 		m_BlueLightUniformBuffer_.reset(UniformBuffer::Create(sizeof(tmp_detail::BlueLightData), 1));
 
@@ -362,19 +349,7 @@ namespace NK {
         	glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
         	
 			camera.SetPtojectionMode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-			#if 0
-			m_BlueShader_->SetMat4("u_data.model_matrix", model_matrix);
-			m_BlueShader_->SetInt("u_data.current_frame", m_Frame_++);
-
-        	m_BlueShader_->SetMat4( "u_data.view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-			m_BlueShader_->SetVec3( "u_data.camera_position", camera.GetCameraPosition());
-        	m_BlueShader_->SetVec3( "u_data.light_position", glm::vec3(light_source_position[0], light_source_position[1], light_source_position[2]));
-        	m_BlueShader_->SetVec3( "u_data.light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
-        	m_BlueShader_->SetFloat("u_data.ambient_factor", ambient_factor);
-        	m_BlueShader_->SetFloat("u_data.diffuse_factor", diffuse_factor);
-        	m_BlueShader_->SetFloat("u_data.specular_factor", specular_factor);
-        	m_BlueShader_->SetFloat("u_data.shininess", shininess);
-			#else
+			
 			m_BlueCameraData_.current_frame++;
 			m_BlueCameraData_.model_matrix = model_matrix;
 			m_BlueCameraData_.view_projection_matrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
@@ -389,7 +364,6 @@ namespace NK {
 			
 			m_BlueCameraUniformBuffer_->SetData(&m_BlueCameraData_, sizeof(tmp_detail::BlueCameraData));
 			m_BlueLightUniformBuffer_->SetData(&m_BlueLightData_, sizeof(tmp_detail::BlueLightData));
-			#endif
 			
 			// drawing m_SquareVA_
 			Renderer::Submit(m_SquareVA_);
@@ -401,12 +375,8 @@ namespace NK {
                     0, 1, 0, 0,
                     0, 0, 1, 0,
                     current_position[0], current_position[1], current_position[2], 1);
-				#if 0
-				m_BlueShader_->SetMat4("u_data.model_matrix", translate_matrix);
-				#else
 				m_BlueCameraData_.model_matrix = translate_matrix;
 				m_BlueCameraUniformBuffer_->SetData(&m_BlueCameraData_, sizeof(tmp_detail::BlueCameraData));
-				#endif
 
                 Renderer::Submit(m_SquareVA_);
             }
@@ -414,25 +384,16 @@ namespace NK {
 			// light source
         	{
             	m_LightSourceShader_->Bind();
-				#if 0
-            	m_LightSourceShader_->SetMat4("u_data.view_projection_matrix", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-            	#else
 				m_LightCameraData_.view_projection_matrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 				m_LightCameraDataUniformBuffer_->SetData(&m_LightCameraData_, sizeof(tmp_detail::LightCameraData));
-				#endif
 				glm::mat4 translate_matrix(1, 0, 0, 0,
             	    0, 1, 0, 0,
             	    0, 0, 1, 0,
             	    light_source_position[0], light_source_position[1], light_source_position[2], 1);
-            	#if 0
-				m_LightSourceShader_->SetMat4("u_data.model_matrix", translate_matrix);
-            	m_LightSourceShader_->SetVec3("u_data.light_color", glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]));
-            	#else
-				m_LightCameraData_.model_matrix = translate_matrix;
+            	m_LightCameraData_.model_matrix = translate_matrix;
 				m_LightColor_.light_color = glm::vec3(light_source_color[0], light_source_color[1], light_source_color[2]);
 				m_LightCameraDataUniformBuffer_->SetData(&m_LightCameraData_, sizeof(tmp_detail::LightCameraData));
 				m_LightColorUniformBuffer_->SetData(&m_LightColor_, sizeof(tmp_detail::LightColor));
-				#endif
 				Renderer::Submit(m_LightSourceIceCube_);
         	}
 			Renderer::EndScene();

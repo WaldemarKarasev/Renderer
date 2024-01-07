@@ -2,7 +2,6 @@
 
 #include "Nutckracker/Renderer/Texture.h"
 #include <glad/glad.h>
-#if 1
 
 namespace NK {
     
@@ -45,4 +44,3 @@ namespace NK {
     };
 
 }
-#endif

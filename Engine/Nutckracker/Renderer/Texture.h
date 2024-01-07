@@ -3,7 +3,6 @@
 #include <string>
 
 namespace NK {
-#if 1
 
     enum class ImageFormat {
         None = 0,
@@ -19,7 +18,7 @@ namespace NK {
         uint32_t Height = 1;
         ImageFormat Format = ImageFormat::RGB8;
         bool GenerateMips = true;
-        void* data;
+        void* data = nullptr;
     };
 
     class Texture
@@ -50,25 +49,4 @@ namespace NK {
         static Texture2D* Create(const TextureSpecification& specification);
         static Texture2D* Create(const std::string& filepath);
     };
-
-    #else
-    class Texture2D {
-    public:
-        Texture2D(const unsigned char* data, const unsigned int width, const unsigned int height);
-        ~Texture2D();
-
-        Texture2D(const Texture2D&) = delete;
-        Texture2D& operator=(const Texture2D&) = delete;
-        Texture2D& operator=(Texture2D&& texture) noexcept;
-        Texture2D(Texture2D&& texture) noexcept;
-
-        void Bind(const unsigned int unit) const;
-
-    private:
-        unsigned int m_Id_ = 0;
-        unsigned int m_Width_ = 0;
-        unsigned int m_Height_ = 0;
-    };
-    #endif
-
 }
