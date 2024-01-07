@@ -261,7 +261,7 @@ namespace NK {
 
 		for (auto& [stage, data] : shaderData)
 		{
-			Reflect(stage, data);
+			//Reflect(stage, data);
 		}
 
 	}
@@ -306,8 +306,8 @@ namespace NK {
 				m_OpenGLSourceCode_[stage] = glslCompiler.compile();
 				auto& source = m_OpenGLSourceCode_[stage];
 
-				NK_TRACE("Ready to be compiled GLSL source code:");
-				NK_TRACE(source);
+				//NK_TRACE("Ready to be compiled GLSL source code:");
+				//NK_TRACE(source);
 
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, detail::GLShaderStageToShaderC(stage), m_FilePath_.c_str());
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)

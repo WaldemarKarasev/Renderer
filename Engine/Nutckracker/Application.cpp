@@ -250,7 +250,7 @@ namespace NK {
 		unsigned char* data = new unsigned char[m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels];
 		
 		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
-		#if 0 
+		#if 1 
 		TextureSpecification TexSpec;
 		TexSpec.Width = m_TextureWidth_;
 		TexSpec.Height = m_TextureHeight_;

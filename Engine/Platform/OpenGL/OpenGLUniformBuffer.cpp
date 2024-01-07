@@ -9,7 +9,6 @@ namespace NK {
         glCreateBuffers(1, &m_RendererID_);
         glNamedBufferData(m_RendererID_, size, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint
         glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID_);
-        NK_CORE_TRACE("UNIFORM BUFFER m_RendererID_ = {0}", m_RendererID_);
     }
 
     OpenGLUniformBuffer::~OpenGLUniformBuffer()

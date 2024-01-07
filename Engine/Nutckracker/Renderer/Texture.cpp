@@ -4,7 +4,7 @@
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace NK {
-    #if 0
+    #if 1
     Texture2D* Texture2D::Create(const TextureSpecification& specification)
 	{
 		switch (Renderer::GetAPI())

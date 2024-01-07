@@ -3,7 +3,7 @@
 #include <string>
 
 namespace NK {
-#if 0
+#if 1
 
     enum class ImageFormat {
         None = 0,

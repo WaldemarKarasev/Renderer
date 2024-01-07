@@ -1,6 +1,6 @@
 #include "nkpch.h"
 #include "OpenGLTexture.h"
-#if 0
+#if 1
 namespace NK {
 
     namespace detail {
@@ -34,6 +34,10 @@ namespace NK {
     {
         m_InternalFormat_ = detail::NutckrackerImageFormatToGLInternalFormat(m_Specification_.Format);
         m_DataFormat_ = detail::NutckrackerImageFormatToGLDataFormat(m_Specification_.Format);
+        NK_CORE_TRACE("OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification)");
+        NK_CORE_TRACE("m_spec_ = {0}, {1}", specification.Width, specification.Height);
+        NK_CORE_TRACE("m_Width_ = {0}", m_Width_);
+        NK_CORE_TRACE("m_Height = {0}", m_Height_);
 
         //GLsizei mip_levels = 1;
         //if (specification.GenerateMips)
@@ -66,17 +70,15 @@ namespace NK {
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID_);
         
         GLsizei mip_levels = static_cast<GLsizei>(std::log2(std::max(m_Width_, m_Height_))) + 1;
+        mip_levels = 1;
         glTextureStorage2D(m_RendererID_, mip_levels, GL_RGB8, m_Width_, m_Height_);
         glTextureSubImage2D(m_RendererID_, 0, 0, 0, m_Width_, m_Height_, GL_RGB, GL_UNSIGNED_BYTE, specification.data);
         glTextureParameteri(m_RendererID_, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID_, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTextureParameteri(m_RendererID_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(m_RendererID_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateTextureMipmap(m_RendererID_);
+        //glGenerateTextureMipmap(m_RendererID_);
         #endif
-
-        NK_CORE_TRACE("{0} ----- {1}",m_Width_, m_Height_);
-        NK_CORE_TRACE("Texture Reflect: m_InternalFormat - {0}, m_DataFormat - {1}, m_RendererID_- {2}", m_InternalFormat_, m_DataFormat_, m_RendererID_);
     }
 
     OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath)
@@ -137,8 +139,11 @@ namespace NK {
     {
         uint32_t bpp = m_DataFormat_ == GL_RGBA ? 4 : 3;
         NK_CORE_TRACE("bpp = {0}", bpp);
+        NK_CORE_TRACE("bpp = {0}", m_Width_);
+        NK_CORE_TRACE("bpp = {0}", m_Height_);
+        NK_CORE_TRACE("bpp = {0}", size);
         NK_CORE_ASSERT(size == m_Width_ * m_Height_ * bpp, "Data must be entire texture!");
-        glTextureSubImage2D(m_RendererID_, 0, 0, 0, m_Width_, m_Height_, m_DataFormat_, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(m_RendererID_, 0, 0, 0, m_Width_, m_Height_, GL_RGB, GL_UNSIGNED_BYTE, data);
         if (m_Specification_.GenerateMips)
         {
             glGenerateTextureMipmap(m_RendererID_);
