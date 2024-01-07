@@ -12,7 +12,7 @@
 #include "Nutckracker/Log.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
-
+#include "Platform/OpenGL/OpenGLTexture.h"
 
 // for testing texture generation
 #include "ApplicationTextures.h"
@@ -230,13 +230,23 @@ namespace NK {
 		
 		unsigned char* data = new unsigned char[m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels];
 		
+		TextureSpecification TexSpec;
+		TexSpec.Height = m_TextureHeight_;
+		TexSpec.Width = m_TextureWidth_;
+		TexSpec.GenerateMips = true;
+
 		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
-		m_SmileTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
+		//m_SmileTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
+		m_SmileTexture_.reset(Texture2D::Create(TexSpec));//std::make_shared<Texture2D>(TexSpec);
+		m_SmileTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
+		
 		m_SmileTexture_->Bind(0);
 		
 		generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
-		m_QuadsTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
-		m_QuadsTexture_->Bind(1);
+		//m_QuadsTexture_ = std::make_shared<Texture2D>(data, m_TextureWidth_, m_TextureHeight_);
+		m_QuadsTexture_ = std::make_shared<OpenGLTexture2D>(TexSpec);
+		m_QuadsTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
+		//m_QuadsTexture_->Bind(1);
 
 		delete[] data;
 

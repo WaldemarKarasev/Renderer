@@ -4,7 +4,9 @@
 #include <cmath>
 #include <glad/glad.h>
 #include "nkpch.h"
-
+#include "Nutckracker/Renderer/Renderer.h"
+#include "Platform/OpenGL/OpenGLTexture.h"
+#if 0
 namespace NK {
         Texture2D::Texture2D(const unsigned char* data, const unsigned int width, const unsigned int height)
         : m_Width_(width), m_Height_(height)
@@ -51,3 +53,19 @@ namespace NK {
             glBindTextureUnit(unit, m_Id_);
         }
 }
+#else
+namespace NK {
+
+    Texture2D* Texture2D::Create(const TextureSpecification& specification)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::None:    return nullptr;
+			case RendererAPI::API::OpenGL:  return new OpenGLTexture2D(specification);
+		}
+
+		return nullptr;
+    }
+}
+
+#endif

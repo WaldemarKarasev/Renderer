@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME}
     Nutckracker/Renderer/Shader.cpp
     Nutckracker/Renderer/Texture2D.cpp
     Nutckracker/Renderer/VertexArray.cpp
+
     
     Platform/CrossPlatform/GLFWInput.cpp
     Platform/CrossPlatform/GLFWWindow.cpp
@@ -30,6 +31,7 @@ add_library(${PROJECT_NAME}
     Platform/OpenGL/OpenGLRendererAPI.cpp
     Platform/OpenGL/OpenGLShader.cpp
     Platform/OpenGL/OpenGLVertexArray.cpp
+    Platform/OpenGL/OpenGLTexture.cpp
 
 
 
