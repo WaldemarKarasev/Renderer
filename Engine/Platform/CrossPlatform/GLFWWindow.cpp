@@ -1,11 +1,10 @@
 #include "nkpch.h"
-#include "GLFWWindow.h"
+#include "GLFWWindow.hpp"
 
 #include "Nutckracker/Events/ApplicationEvent.h"
 #include "Nutckracker/Events/KeyEvent.h"
 #include "Nutckracker/Events/MouseEvent.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace NK {
 
@@ -50,14 +49,9 @@ namespace NK {
 			s_GLFWInitialized = true;
 		}
 		
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+
 		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data_.Title.c_str(), nullptr, nullptr);
-		
-		m_Context_ = new OpenGLContext(m_Window_);
-		m_Context_->Init();
 
 		glfwSetWindowUserPointer(m_Window_, &m_Data_);
 		SetVSync(true);
@@ -164,7 +158,7 @@ namespace NK {
 	void GLFWWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		m_Context_->SwapBuffers();
+		//m_Context_->SwapBuffers(); -> moved to Renderer
 	}
 
 	void GLFWWindow::SetVSync(bool enabled)
@@ -180,6 +174,16 @@ namespace NK {
 	bool GLFWWindow::IsVSync() const
 	{
 		return m_Data_.VSync;
+	}
+
+	void GLFWWindow::CreateVKSurface(VkInstance instance, VkSurfaceKHR* surface) const 
+	{
+		if(glfwCreateWindowSurface(instance, m_Window_, nullptr, surface) != VK_SUCCESS)
+        {
+			NK_CORE_ERROR("failed to create window surface");
+			NK_CORE_ASSERT(false, "Creation window surface creation failure!");
+            throw std::runtime_error("failed to create window surface");
+        }
 	}
 
 }

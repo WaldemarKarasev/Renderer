@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Nutckracker/Window.h"
-#include "Nutckracker/Renderer/GraphicsContext.h"
+#include "Nutckracker/Window.hpp"
 
 
 //#include <glad/glad.h>
@@ -21,6 +20,9 @@ namespace NK {
 		inline unsigned int GetWidth() const override { return m_Data_.Width; }
 		inline unsigned int GetHeight() const override { return m_Data_.Height; }
 
+		virtual void CreateVKSurface(VkInstance instance, VkSurfaceKHR* surface) const override;
+
+
 		// Window attributes
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data_.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
@@ -28,15 +30,18 @@ namespace NK {
 
 		inline virtual void* GetNativeWindow() const override { return m_Window_; }
 
+		// Me
+		virtual const char** GetRequiredExtensions(uint32_t* extensionsCount) const override { return glfwGetRequiredInstanceExtensions(extensionsCount); }
+		virtual void WaitEvents() const override { glfwWaitEvents(); }
+
 	private:
+
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	
 	private:
 		GLFWwindow* m_Window_;
-		GraphicsContext* m_Context_;
-
-
+		
 		struct WindowData
 		{
 			std::string Title;

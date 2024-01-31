@@ -1,7 +1,7 @@
 #include "nkpch.h"
 #include "GLFWInput.h"
 
-#include "Nutckracker/Application.h"
+#include "Nutckracker/Application.hpp"
 #include <GLFW/glfw3.h>
 
 namespace NK {

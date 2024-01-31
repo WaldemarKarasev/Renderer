@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -17,6 +18,7 @@
 #include <unordered_set>
 
 #include "Nutckracker/Log.h"
+#include "Nutckracker/Core.h"
 
 #ifdef NK_PLATFORM_LINUX
 

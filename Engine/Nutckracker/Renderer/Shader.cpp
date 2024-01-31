@@ -1,19 +1,20 @@
 #include "nkpch.h"
-#include "Shader.h"
+#include "Shader.hpp"
 
-#include "Renderer.h"
-#include "Platform/OpenGL/OpenGLShader.h"
-
+#include "Renderer.hpp"
+#include "Platform/OpenGL/OpenGLShader.hpp"
+#include "Platform/Vulkan/VulkanShader.hpp"
 
 namespace NK {
 
 	// Shader class 
 	Shader* Shader::Create(const std::string& filepath)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL: return new OpenGLShader(filepath);
+			case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL: return new OpenGLShader(filepath);
+			case RendererAPI::API::Vulkan: return new VulkanShader(filepath);
 		}
 		NK_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -21,10 +22,11 @@ namespace NK {
 
 	Shader* Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL: return new OpenGLShader(name, vertexSrc, fragmentSrc);	
+			case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL: return new OpenGLShader(name, vertexSrc, fragmentSrc);	
+			case RendererAPI::API::Vulkan: return new VulkanShader(name, vertexSrc, fragmentSrc);
 		}
 		NK_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;

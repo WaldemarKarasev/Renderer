@@ -1,4 +1,35 @@
 #pragma once
+
+
+
+/*      TEXTURE GENERATION EXAMPLE
+
+
+
+		//Texture initialization
+		unsigned char* data = new unsigned char[m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels];
+		
+		TextureSpecification TexSpec;
+		TexSpec.Width = m_TextureWidth_;
+		TexSpec.Height = m_TextureHeight_;
+		TexSpec.GenerateMips = true;
+		TexSpec.data = data;
+		
+		generate_smile_texture(data, m_TextureWidth_, m_TextureHeight_);
+		m_SmileTexture_.reset(Texture2D::Create(TexSpec));
+		m_SmileTexture_->SetData(data, m_TextureWidth_ * m_TextureHeight_ * m_TextureChannels);
+		//m_SmileTexture_->Bind(0);
+		
+		generate_quads_texture(data, m_TextureWidth_, m_TextureHeight_);
+		m_QuadsTexture_.reset(Texture2D::Create(TexSpec));
+		//m_QuadsTexture_->Bind(1);
+		
+		delete[] data;
+
+
+
+*/
+
 void generate_circle(unsigned char* data,
                          const unsigned int width,
                          const unsigned int height,

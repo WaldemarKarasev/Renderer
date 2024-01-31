@@ -52,7 +52,7 @@ namespace NK {
 	/////////////////////////////////////////////////////////////////////////////
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count, const BufferUsage usage)
-		: m_Count_(count)
+		: m_IndexCount_(count)
 	{
 		glCreateBuffers(1, &m_RendererID_);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID_);

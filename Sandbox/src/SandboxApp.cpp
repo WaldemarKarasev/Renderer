@@ -131,6 +131,7 @@ public:
 			m_CurrentMousePos_Y_ = e.GetY();
 		}
 
+		#if 0
 		NK::Camera* camera = app.GetCamera();
 		if (MouseRightButtonPressed)
 		{
@@ -148,7 +149,7 @@ public:
 		}
 
 		camera->AddMovementAndRotation(MovementDelta, RotationDelta);
-
+		#endif
 	}
 	
 };

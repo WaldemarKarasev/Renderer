@@ -1,4 +1,4 @@
-#include "OpenGLShader.hpp"
+#include "VulkanShader.hpp"
 #include "nkpch.h"
 
 #include <fstream>
@@ -11,42 +11,44 @@
 #include <spirv_cross/spirv_glsl.hpp>
 
 
+#include "VulkanRenderBackend.hpp"
+#include "VKContext.hpp"
 
 namespace NK {
 
 	namespace detail {
-		static GLenum ShaderTypeFromString(const std::string& type)
+		static uint32_t ShaderTypeFromString(const std::string& type)
 		{
 			if (type == "vertex")
 			{
-				return GL_VERTEX_SHADER;
+				return VK_SHADER_STAGE_VERTEX_BIT;
 			}
 			if (type == "fragment" || type == "pixel")
 			{
-				return GL_FRAGMENT_SHADER;
+				return VK_SHADER_STAGE_FRAGMENT_BIT;
 			}
 
 			NK_CORE_ASSERT(false, "Unknown shader type");
 			return 0;
 		}
 
-		static shaderc_shader_kind GLShaderStageToShaderC(GLenum stage)
+		static shaderc_shader_kind GLShaderStageToShaderC(uint32_t stage)
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER: return shaderc_glsl_vertex_shader;
-			case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+			case VK_SHADER_STAGE_VERTEX_BIT: return shaderc_glsl_vertex_shader;
+			case VK_SHADER_STAGE_FRAGMENT_BIT: return shaderc_glsl_fragment_shader;
 			}
 			NK_CORE_ASSERT(false, "Unknown shaderc_shader_kind type!");
 			return static_cast<shaderc_shader_kind>(0);
 		}
 		
-		static const char* GLShaderStageToString(GLenum stage)
+		static const char* GLShaderStageToString(uint32_t stage)
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER: return "GL_VERTEX_SHADER";
-			case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+			case VK_SHADER_STAGE_VERTEX_BIT: return "VK_VERTEX_SHADER";
+			case VK_SHADER_STAGE_FRAGMENT_BIT: return "VK_FRAGMENT_SHADER";
 			}
 			NK_CORE_ASSERT(false, "Unknown shaderc_shader_kind type!");
 			return nullptr;
@@ -67,14 +69,14 @@ namespace NK {
 			}
 		}
 
-		static const char* GLShaderStageCacheOpenGLFileExtension(uint32_t stage)
+		static const char* GLShaderStageCacheVulkanFileExtension(uint32_t stage)
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER: return ".cached_opengl.vert";
-			case GL_FRAGMENT_SHADER: return ".cached_opengl.frag";
+			case VK_SHADER_STAGE_VERTEX_BIT: return ".cached_Vulkan.vert";
+			case VK_SHADER_STAGE_FRAGMENT_BIT: return ".cached_Vulkan.frag";
 			}
-			NK_CORE_ASSERT(false, "Unsupported stage for Cached OpenGL File Extension!");
+			NK_CORE_ASSERT(false, "Unsupported stage for Cached Vulkan File Extension!");
 			return "";
 		}
 
@@ -82,15 +84,15 @@ namespace NK {
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER: return ".cached_vulkan.vert";
-			case GL_FRAGMENT_SHADER: return ".cached_vulkan.frag";
+			case VK_SHADER_STAGE_VERTEX_BIT: return ".cached_vulkan.vert";
+			case VK_SHADER_STAGE_FRAGMENT_BIT: return ".cached_vulkan.frag";
 			}
 			NK_CORE_ASSERT(false, "Unsupported stage for Cached Vulkan File Extension!");
 			return "";		
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filepath)
+	VulkanShader::VulkanShader(const std::string& filepath)
 	: m_FilePath_(filepath)
 	{
 		detail::CreateCacheSirectoryIfNeeded();
@@ -100,9 +102,8 @@ namespace NK {
 		
 		{
 			//Timer timer; //TODO: timer implementation
-			CompileOrGetVulkanBinaries(shaderSources);
-			CompileOrGetOpenGLBinaries();
-			CreateProgram();
+			CompileVulkanBinaries(shaderSources);
+			CreateShaderModule();
 			//NK_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 		}
 
@@ -114,31 +115,29 @@ namespace NK {
 		m_Name_ = filepath.substr(lastSlash, count);
 	}
 
-    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+    VulkanShader::VulkanShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	: m_Name_(name)
 	{
 		NK_TRACE("shader name: {0}", name);
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSrc;
-		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
-		CompileOrGetVulkanBinaries(sources);
-		CompileOrGetOpenGLBinaries();
-		CreateProgram();
+		std::unordered_map<uint32_t, std::string> sources;
+		sources[VK_SHADER_STAGE_VERTEX_BIT] = vertexSrc;
+		sources[VK_SHADER_STAGE_FRAGMENT_BIT] = fragmentSrc;
+		CompileVulkanBinaries(sources);
+		CreateShaderModule();
 	}
 
-	OpenGLShader::~OpenGLShader()
+	VulkanShader::~VulkanShader()
 	{
-		glDeleteProgram(m_RendererID_);
 	}
 	
 	#if 0
-	OpenGLShader::OpenGLShader(OpenGLShader&& shader) noexcept
+	VulkanShader::VulkanShader(VulkanShader&& shader) noexcept
 	{
 		m_RendererID_ = shader.m_RendererID_;
 		shader.m_RendererID_ = 0;
 	}
 
-	OpenGLShader& OpenGLShader::operator=(OpenGLShader&& shader) noexcept
+	VulkanShader& VulkanShader::operator=(VulkanShader&& shader) noexcept
 	{
 		m_RendererID_ = shader.m_RendererID_;
 		shader.m_RendererID_ = 0;
@@ -148,7 +147,7 @@ namespace NK {
 	}
 	#endif
 
-	std::string OpenGLShader::ReadFile(const std::string& filepath)
+	std::string VulkanShader::ReadFile(const std::string& filepath)
 	{
 		std::string result;
 		std::string tmp = filepath;
@@ -175,9 +174,9 @@ namespace NK {
 		return result;
 	}
 
-	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
+	std::unordered_map<uint32_t, std::string> VulkanShader::PreProcess(const std::string& source)
 	{
-		std::unordered_map<GLenum, std::string> shaderSources;
+		std::unordered_map<uint32_t, std::string> shaderSources;
 
 		const char* typeToken = "#type";
 		size_t typeTokenLenght = strlen(typeToken);
@@ -199,10 +198,8 @@ namespace NK {
 		return shaderSources;
 	}
 
-	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
+	void VulkanShader::CompileVulkanBinaries(const std::unordered_map<uint32_t, std::string>& shaderSources)
 	{
-		GLuint proram = glCreateProgram();
-
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
@@ -238,12 +235,11 @@ namespace NK {
 			}
 			else
 			{
-				NK_CORE_TRACE("trace else, line {0}", __LINE__);
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, detail::GLShaderStageToShaderC(stage), m_FilePath_.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
 					NK_CORE_ERROR(module.GetErrorMessage());
-					NK_CORE_ASSERT(false, "CompileOrGetVulkanBinaries: Module compilation error!");
+					NK_CORE_ASSERT(false, "CompileVulkanBinaries: Module compilation error!");
 				}
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
@@ -266,121 +262,39 @@ namespace NK {
 
 	}
 
-	void OpenGLShader::CompileOrGetOpenGLBinaries()
+	
+	void VulkanShader::CreateShaderModule()
 	{
-		NK_TRACE("\n\nOpenGLShader::CompileOrGetOpenGLBinaries()");
-		auto& shaderData = m_OpenGLSPIRV_;
+		// Creating m_VertexShaderModule_	
+		VkShaderModuleCreateInfo vertexCreateInfo{};
+        vertexCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        vertexCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].size();
+        vertexCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].data());
 
-		shaderc::Compiler compiler;
-		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		const bool optimize = false;
-		if (optimize)
-		{
-			options.SetOptimizationLevel(shaderc_optimization_level_performance);
-		}
+        if(vkCreateShaderModule(vkContext.device, &vertexCreateInfo, nullptr, m_VertexShaderModule_) != VK_SUCCESS)
+        { 
+			NK_CORE_ERROR("Vertex ShaderModule creation failure!");
+			NK_CORE_ASSERT(false, "Failed to create vertex shader module");
+        }
 
-		std::experimental::filesystem::path cacheDirectory = detail::GetCacheDirectory();
+		// Creating m_FragmentShaderModule_
+		VkShaderModuleCreateInfo fragmentCreateInfo{};
+        fragmentCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        fragmentCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].size();
+        fragmentCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].data());
 
-		shaderData.clear();
-		m_OpenGLSourceCode_.clear();
-		for (auto&& [stage, spirv] : m_VulkanSPIRV_)
-		{
-			std::experimental::filesystem::path shaderFilePath = m_FilePath_;
-			std::experimental::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string(), + detail::GLShaderStageCacheOpenGLFileExtension(stage));
-
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
-			{
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
-
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read((char*)data.data(), size);
-			}
-			else
-			{
-				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				m_OpenGLSourceCode_[stage] = glslCompiler.compile();
-				auto& source = m_OpenGLSourceCode_[stage];
-
-				//NK_TRACE("Ready to be compiled GLSL source code:");
-				//NK_TRACE(source);
-
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, detail::GLShaderStageToShaderC(stage), m_FilePath_.c_str());
-				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					NK_CORE_ERROR(module.GetErrorMessage());
-					NK_CORE_ASSERT(false, "CompileOrGetOpenGLBinaries: Module compilation error!");
-				}
-
-				shaderData[stage] = std::vector<uint32_t>(module.begin(), module.end());
-
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
-				if (out.is_open())
-				{
-					auto& data = shaderData[stage];
-					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
-				}
-			}
-		}
-
+        if(vkCreateShaderModule(vkContext.device, &fragmentCreateInfo, nullptr, m_FragmentShaderModule_) != VK_SUCCESS)
+        { 
+            throw std::runtime_error("failed to create shader module");
+        }
 	}
 
-	void OpenGLShader::CreateProgram()
-	{	
-		GLuint program = glCreateProgram();
-
-		std::vector<GLuint> shaderIDs;
-		for (auto&& [stage, spirv] : m_OpenGLSPIRV_)
-		{
-			//GLuint tmp = glCreateShader(stage);
-			//GLuint shaderID = shaderIDs.emplace_back(tmp);
-			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
-			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
-			glAttachShader(program, shaderID);
-		}
-
-		glLinkProgram(program);
-
-		GLint isLinked;
-		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH,  &maxLength);
-
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-
-			glDeleteProgram(program);
-
-			for (auto id : shaderIDs)
-			{
-				glDeleteShader(id);
-			}
-		}
-
-		for (auto id : shaderIDs)
-		{
-			glDetachShader(program, id);
-			glDeleteShader(id);
-		}
-
-		m_RendererID_ = program;
-	}
-
-	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData)
+	void VulkanShader::Reflect(uint32_t stage, const std::vector<uint32_t>& shaderData)
 	{
 		spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		NK_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", detail::GLShaderStageToString(stage), m_FilePath_);
+		NK_CORE_TRACE("VulkanShader::Reflect - {0} {1}", detail::GLShaderStageToString(stage), m_FilePath_);
 		NK_CORE_TRACE("		{0} uniform buffers", resources.uniform_buffers.size());
 		NK_CORE_TRACE("		{0} resources", resources.sampled_images.size());
 
@@ -399,15 +313,6 @@ namespace NK {
 		}
 	}
 
-	#if 0
-	void OpenGLShader::Bind() const
-	{
-		glUseProgram(m_RendererID_);
-	}
 
-	void OpenGLShader::Unbind() const
-	{
-		glUseProgram(0);
-	}
-	#endif
+
 }

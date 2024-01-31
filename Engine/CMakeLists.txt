@@ -14,28 +14,39 @@ add_library(${PROJECT_NAME}
 
     Nutckracker/Renderer/Buffer.cpp
     Nutckracker/Renderer/Camera.cpp
-    Nutckracker/Renderer/RenderCommand.cpp
-    Nutckracker/Renderer/RendererAPI.cpp
+    Nutckracker/Renderer/GameObject.cpp
+    Nutckracker/Renderer/GraphicsContext.cpp
+    Nutckracker/Renderer/Model.cpp
+    Nutckracker/Renderer/Pipeline.cpp
+    Nutckracker/Renderer/RenderBackend.cpp
     Nutckracker/Renderer/Renderer.cpp
+    Nutckracker/Renderer/RendererAPI.cpp
     Nutckracker/Renderer/Shader.cpp
     Nutckracker/Renderer/Texture.cpp
     Nutckracker/Renderer/UniformBuffer.cpp
-    Nutckracker/Renderer/VertexArray.cpp
     
     Platform/CrossPlatform/GLFWInput.cpp
     Platform/CrossPlatform/GLFWWindow.cpp
 
     
-    Platform/OpenGL/OpenGLBuffer.cpp
-    Platform/OpenGL/OpenGLContext.cpp
-    Platform/OpenGL/OpenGLRendererAPI.cpp
-    Platform/OpenGL/OpenGLShader.cpp
-    Platform/OpenGL/OpenGLTexture.cpp
-    Platform/OpenGL/OpenGLUniformBuffer.cpp
-    Platform/OpenGL/OpenGLVertexArray.cpp
+    #Platform/OpenGL/OpenGLBuffer.cpp
+    #Platform/OpenGL/OpenGLContext.cpp
+    #Platform/OpenGL/OpenGLRendererAPI.cpp
+    #Platform/OpenGL/OpenGLShader.cpp
+    #Platform/OpenGL/OpenGLTexture.cpp
+    #Platform/OpenGL/OpenGLUniformBuffer.cpp
+    #Platform/OpenGL/OpenGLVertexArray.cpp
 
-
-
+    Platform/Vulkan/RenderSystems/PointLightSystem.cpp
+    Platform/Vulkan/RenderSystems/SimpleRenderSystem.cpp
+    Platform/Vulkan/VulkanBuffer.cpp
+    Platform/Vulkan/VulkanDescriptors.cpp
+    Platform/Vulkan/VulkanDevice.cpp
+    Platform/Vulkan/VulkanModel.cpp
+    Platform/Vulkan/VulkanPipeline.cpp
+    Platform/Vulkan/VulkanRenderBackend.cpp
+    Platform/Vulkan/VulkanShader.cpp
+    Platform/Vulkan/VulkanSwapChain.cpp
 )
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog)

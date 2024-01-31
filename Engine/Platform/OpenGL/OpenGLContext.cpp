@@ -14,7 +14,12 @@ namespace NK {
 
 	void OpenGLContext::Init()
 	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 		glfwMakeContextCurrent(m_WindowHandle_);
+		
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		NK_CORE_ASSERT(status, "Failed to initialize Glad!");	
 

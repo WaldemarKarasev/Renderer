@@ -2,7 +2,7 @@
 
 #include "Core.h"
 
-#include "Nutckracker/Renderer/GraphicsContext.h"
+#include "Nutckracker/Renderer/GraphicsContext.hpp"
 
 struct NK_API GLFWwindow;
 
@@ -15,6 +15,7 @@ namespace NK {
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+		
 	private:
 		GLFWwindow* m_WindowHandle_;
 	};

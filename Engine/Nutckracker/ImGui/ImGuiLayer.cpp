@@ -7,7 +7,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "glm/vec4.hpp"
 
-#include "Nutckracker/Application.h"
+#include "Nutckracker/Application.hpp"
 
 // Temporary
 #include <glad/glad.h>
@@ -98,6 +98,7 @@ namespace NK {
 
     void ImGuiLayer::OnImGuiRender()
     {
+		#if 0
 		NK::Application& app = Application::Get();
 		NK::Camera* camera = app.GetCamera();
 
@@ -169,5 +170,6 @@ namespace NK {
         }
 
 		ImGui::Checkbox("Perspective camera", app.GetCameraMode());
+		#endif
     }
 }

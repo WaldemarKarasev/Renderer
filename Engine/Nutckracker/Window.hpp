@@ -1,9 +1,12 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include "nkpch.h"
 
 #include "Nutckracker/Core.h"
 #include "Nutckracker/Events/Event.h"
+
 
 namespace NK {
 
@@ -25,6 +28,7 @@ namespace NK {
 	class NK_API Window
 	{
 	public:
+		// Cherno
 		using EventCallbackFn = std::function<void(Event&)>;
 
 		virtual ~Window() {}
@@ -34,6 +38,8 @@ namespace NK {
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;
 
+		virtual void CreateVKSurface(VkInstance instance, VkSurfaceKHR* surface) const = 0;
+
 		// Window attributes
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
@@ -42,6 +48,12 @@ namespace NK {
 		virtual void* GetNativeWindow() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
+
+
+		// Me
+		// For Vulkan only
+		virtual const char** GetRequiredExtensions(uint32_t* extensionsCount) const = 0;
+		virtual void WaitEvents() const = 0;
 	};
 
 }

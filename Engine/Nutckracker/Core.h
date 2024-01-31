@@ -8,7 +8,8 @@
 	#define NK_ENABLE_ASSERT
 #endif 
 
-
+// for protecting new Vulkan implementation code from running in unexpected places
+#define VULKAN_IMPLEMENTATION
 
 #if defined(NK_PLATFORM_WINDOWS)
 	#ifdef NK_BUILD_DLL
@@ -36,7 +37,7 @@
 
 
 #ifdef NK_ENABLE_ASSERT
-	#define NK_ASSERT(x, ...)	   {if(!(x)) { NK_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
+	#define NK_ASSERT(x, ...)	   {if(!(x)) { NK_ERROR("Assertion Failed: {0}, ::::{1}::{2}", __VA_ARGS__, __FILE__, __LINE__); /*debugbreak();???*/}}
 	#define NK_CORE_ASSERT(x, ...) {if(!(x)) { NK_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); /*debugbreak();???*/}}
 #else
 	#define NK_ASSERT(x, ...)	   

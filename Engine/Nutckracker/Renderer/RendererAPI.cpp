@@ -1,8 +1,10 @@
 #include "nkpch.h"
-#include "RendererAPI.h"
+#include "RendererAPI.hpp"
 
 namespace NK {
 
-	RendererAPI::API RendererAPI::s_API_ = RendererAPI::API::OpenGL;
+	// TODO: Implementa function Create fot choosing RendererAPI at runtime.
+	// Right now it is implemented as fixed API
+	RendererAPI::API RendererAPI::s_API_ = RendererAPI::API::Vulkan;
 
 }
