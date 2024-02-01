@@ -38,7 +38,7 @@ namespace NK
         //vkDestroyPipelineLayout(m_Device_->device(), m_pipelineLayout_, nullptr);
     }
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo)
+    void SimpleRenderSystem::Render(FrameInfo& frameInfo) const
     {
         //m_Pipeline_->bind(frameInfo.commandBuffer);
         m_Pipeline_->Bind();

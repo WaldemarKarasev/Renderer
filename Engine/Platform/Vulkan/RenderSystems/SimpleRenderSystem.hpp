@@ -26,8 +26,8 @@ namespace NK
         //SimpleRenderSystem(VulkanDevice* device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
         ~SimpleRenderSystem();
 
-        SimpleRenderSystem(const SimpleRenderSystem&) = delete;
-        SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
+        //SimpleRenderSystem(const SimpleRenderSystem&) = delete;
+        //SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
         void renderGameObjects(FrameInfo& frameInfo);
         

@@ -26,7 +26,7 @@ struct GlobalVulkanContext
     GPUInfo_t gpu;
     VkDevice  device;
 };
-GlobalVulkanContext vkContext{};
+extern GlobalVulkanContext vkContext;
 
 struct VulkanRenderBackendContext
 {

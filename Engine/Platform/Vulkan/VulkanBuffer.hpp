@@ -11,10 +11,10 @@ class VulkanBuffer : public  Buffer
 {
  public:
 
-  VulkanBuffer(const Builder& builder);
+  VulkanBuffer(const Builder& builder) { /* Empty implementation */ };
 
-  void Bind() const override;
-  void Unbind() const override { /* Empty implementation */}
+  void Bind() const override { /* Empty implementation */ };
+  void Unbind() const override { /* Empty implementation */ }
 
   VulkanBuffer(
       VulkanDevice* device,

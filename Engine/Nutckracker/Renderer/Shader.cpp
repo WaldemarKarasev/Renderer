@@ -2,7 +2,7 @@
 #include "Shader.hpp"
 
 #include "Renderer.hpp"
-#include "Platform/OpenGL/OpenGLShader.hpp"
+//#include "Platform/OpenGL/OpenGLShader.hpp"
 #include "Platform/Vulkan/VulkanShader.hpp"
 
 namespace NK {
@@ -13,7 +13,7 @@ namespace NK {
 		switch (RendererAPI::GetAPI())
 		{
 			case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL: return new OpenGLShader(filepath);
+			case RendererAPI::API::OpenGL: return nullptr;//new OpenGLShader(filepath);
 			case RendererAPI::API::Vulkan: return new VulkanShader(filepath);
 		}
 		NK_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -25,7 +25,7 @@ namespace NK {
 		switch (RendererAPI::GetAPI())
 		{
 			case RendererAPI::API::None: NK_CORE_ASSERT(false, "RendererAPINone is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL: return new OpenGLShader(name, vertexSrc, fragmentSrc);	
+			case RendererAPI::API::OpenGL: return nullptr;//new OpenGLShader(name, vertexSrc, fragmentSrc);	
 			case RendererAPI::API::Vulkan: return new VulkanShader(name, vertexSrc, fragmentSrc);
 		}
 		NK_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -23,8 +23,8 @@ namespace NK
         
         ~PointLightSystem();
 
-        PointLightSystem(const PointLightSystem&) = delete;
-        PointLightSystem& operator=(const PointLightSystem&) = delete;
+        //PointLightSystem(const PointLightSystem&) = delete;
+        //PointLightSystem& operator=(const PointLightSystem&) = delete;
 
     private:
         std::unique_ptr<VulkanPipeline> m_Pipeline_;

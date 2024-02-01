@@ -4,7 +4,7 @@
 #include "Nutckracker/Events/ApplicationEvent.h"
 #include "Nutckracker/Events/KeyEvent.h"
 #include "Nutckracker/Events/MouseEvent.h"
-
+#include "Nutckracker/Renderer/RendererAPI.hpp"
 
 namespace NK {
 
@@ -48,13 +48,27 @@ namespace NK {
 
 			s_GLFWInitialized = true;
 		}
-		
 
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None: 
+			NK_CORE_ERROR("GLFWWindow::Init(). None API was selected!");
+			break;
+
+		case RendererAPI::API::OpenGL: 
+			NK_CORE_TRACE("GLFWWindow::Init(). OpenGL API was selected!");
+			break;
+
+		case RendererAPI::API::Vulkan: 
+			NK_CORE_TRACE("GLFWWindow::Init(). Vulkan API was selected!");
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+			break;
+		}
 
 		m_Window_ = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data_.Title.c_str(), nullptr, nullptr);
-
 		glfwSetWindowUserPointer(m_Window_, &m_Data_);
-		SetVSync(true);
+		//SetVSync(true); // In Vulkan it is the Error (65538)
 
 		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(m_Window_, [](GLFWwindow* window, int width, int height){

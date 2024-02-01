@@ -16,32 +16,32 @@
 
 namespace NK {
 
-	class VulkanRenderBackend : public RenderBackend
+	class VulkanRenderBackend : public NK::RenderBackend
 	{
 	public:
 		// Cherno
 		virtual void Init(Window* window) override;
 		virtual void SetViewPort(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
-		virtual inline void SetClearColor(uint32_t r, uint32_t g, uint32_t b, uint32_t alpha) override;
-		virtual inline void Clear() override;
-		virtual inline void EnableDepthTest() override;
-		virtual inline void DisableDepthTest() override;
-		virtual inline void Draw(const Model* model) override;
-		// Me
+		virtual void SetClearColor(uint32_t r, uint32_t g, uint32_t b, uint32_t alpha) override;
+		virtual void Clear() override;
+		virtual void EnableDepthTest() override;
+		virtual void DisableDepthTest() override;
+		virtual void Draw(const Model* model) override;
 
+		// Me
+		virtual void BeginScene() override;
+		virtual bool BeginFrame() override;
+		virtual void FrameProcessing(FrameInfo& frameInfo, GlobalUbo& ubo) override;
+		virtual void BeginRendering() override;
+		virtual void ProcessRenderingSystems(FrameInfo& frameInfo) override;
+		virtual void EndRendering() override;
+		virtual void EndFrame() override;
+		virtual void EndScene() override;
+
+		// Me
 		virtual void AddRenderSystem(RenderSystem* system) override;
 		virtual void AddRenderSurface(const Window* renderSurface) override;
-		virtual float GetAspectRatio() { return m_SwapChain_->extentAspectRatio(); }
-		// Me
-		virtual inline void BeginScene() override;
-		virtual inline bool BeginFrame() override;
-		virtual inline void FrameProcessing(FrameInfo& frameInfo, GlobalUbo& ubo) override;
-		virtual inline void BeginRendering() override;
-		virtual inline void ProcessRenderingSystems(FrameInfo& frameInfo) override;
-		virtual inline void EndRendering() override;
-		virtual inline void EndFrame() override;
-		virtual inline void EndScene() override;
-
+		virtual float GetAspectRatio() override { return m_SwapChain_->extentAspectRatio(); }
 
 	public:
 		// Static Vulakan context. Will be inited in RenderBackend.

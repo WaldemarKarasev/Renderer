@@ -19,6 +19,7 @@ namespace NK {
         RecreateSwapChain();
         CreateCommandBuffer();
 
+        vkContext.device = m_Device_->device();        
 
         // Creating Global Descriptor Sets and Global Descriptor Layout
         InitGlobalDescroptorSets();
@@ -27,7 +28,6 @@ namespace NK {
         // This step is using for initialization of global static pointers to Vulkan API instances for using in classes inmplemented with Vulkan API.
 
         // Initialization static vulkan context. It will be used for Buffer and Shader initialization.
-        vkContext.device = m_Device_->device();        
 
         // Initialization of RenderBackend Vulkan Global context
         //s_vkRenderBackendContext_.NK_Device = m_Device_;
@@ -266,6 +266,24 @@ namespace NK {
 
         return commandBuffer;
     }
+
+    int  VulkanRenderBackend::GetFrameIndex()
+    {
+
+    }
+    void VulkanRenderBackend::BeginSwapChainRenderPass(VkCommandBuffer commandBuffer)
+    {
+
+    }
+    void VulkanRenderBackend::EndSwapChainRenderPass(VkCommandBuffer commandBuffer)
+    {
+
+    }
+    void VulkanRenderBackend::VKEndFrame()
+    {
+
+    }
+
     #if 0
     int VulkanRenderBackend::getFrameIndex()
     {
@@ -291,14 +309,14 @@ namespace NK {
 
     void VulkanRenderBackend::InitGlobalDescroptorSets()
     {
+        NK_CORE_TRACE("111111");
         m_GlobalPool_ =  
         VulkanDescriptorPool::Builder()
         .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 
-
-
+        NK_CORE_TRACE("222222222");
         //std::vector<std::unique_ptr<VulkanBuffer>> uboBuffers(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
         m_UboBuffers_.reserve(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
