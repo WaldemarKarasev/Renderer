@@ -33,7 +33,9 @@ class VulkanSwapChain {
   uint32_t height() { return swapChainExtent.height; }
 
   float extentAspectRatio() {
-    return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
+    float ret = static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
+    NK_CORE_TRACE("extension = {0}, {1}; ret = {2}", swapChainExtent.width, swapChainExtent.height, ret);
+    return ret;
   }
   VkFormat findDepthFormat();
 

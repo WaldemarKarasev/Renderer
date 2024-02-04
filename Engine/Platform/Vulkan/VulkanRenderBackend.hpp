@@ -97,14 +97,14 @@ namespace NK {
 	private:
 	//----------------GLOBAL SET LAYOUT-----------------//
 
-	std::vector<VkDescriptorSet> m_GlobalDescriptorSets_;
+	std::vector<VkDescriptorSet> m_GlobalDescriptorSets_{VulkanSwapChain::MAX_FRAMES_IN_FLIGHT};
 	//std::unique_ptr<VkDescriptorSetLayout> m_GlobalDescriptorSetLayout_ = nullptr;
 	std::unique_ptr<VulkanDescriptorPool> m_GlobalPool_ = nullptr;
 	std::unique_ptr<VulkanDescriptorSetLayout> m_GlobalSetLayout_ = nullptr;
 	void InitGlobalDescroptorSets();
 
 	//Global Ubo buffers
-	std::vector<std::unique_ptr<VulkanBuffer>> m_UboBuffers_;
+	std::vector<std::unique_ptr<VulkanBuffer>> m_UboBuffers_{VulkanSwapChain::MAX_FRAMES_IN_FLIGHT};
 
 
 	private:

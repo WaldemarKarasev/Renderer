@@ -96,7 +96,7 @@ namespace NK
         VkPipeline m_GraphicsPipeLine_;
         VkPipelineLayout m_PipelineLayout_;
         VkDescriptorSetLayout m_GlobalSetLayout;
-        PipeLineConfigInfo m_ConfigInfo_;
+        PipeLineConfigInfo m_ConfigInfo_{};
         
         SystemInfo m_SystemInfo_;
         std::unique_ptr<VulkanShader> m_ShaderModule_ = nullptr;

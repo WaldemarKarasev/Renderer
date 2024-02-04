@@ -19,6 +19,8 @@ namespace NK {
 		return m_RenderBackend_->BeginFrame();
 	}
 
+	
+
 	void Renderer::FrameProcessing(FrameInfo& frameInfo, GlobalUbo& ubo)
 	{
 		m_RenderBackend_->FrameProcessing(frameInfo, ubo);	
@@ -66,7 +68,8 @@ namespace NK {
 
 	float Renderer::GetAspectRatio()
 	{
-		m_RenderBackend_->GetAspectRatio();
+		float return_value = m_RenderBackend_->GetAspectRatio();
+		return return_value;
 	}
 
 

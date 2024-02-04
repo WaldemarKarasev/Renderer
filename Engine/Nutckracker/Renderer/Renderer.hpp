@@ -29,6 +29,8 @@ namespace NK {
 		float GetAspectRatio();
 		RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
+		RenderBackend* GetRenderBackend() { return m_RenderBackend_; }
+
 	private:
 		RenderBackend* m_RenderBackend_ = nullptr;
 	};

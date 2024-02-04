@@ -91,7 +91,6 @@ VulkanDescriptorPool::VulkanDescriptorPool(
   descriptorPoolInfo.pPoolSizes = poolSizes.data();
   descriptorPoolInfo.maxSets = maxSets;
   descriptorPoolInfo.flags = poolFlags;
-  NK_CORE_TRACE("33333333333333");
   if (vkCreateDescriptorPool(vkContext.device, &descriptorPoolInfo, nullptr, &descriptorPool) !=
       VK_SUCCESS) {
     throw std::runtime_error("failed to create descriptor pool!");

@@ -26,8 +26,8 @@ namespace NK {
     
     public:
     // Getters specific for VulkanShader
-    VkShaderModule GetVertexShaderModule() const { return *m_VertexShaderModule_; }
-    VkShaderModule GetFragmentShaderModule() const { return *m_FragmentShaderModule_; }
+    VkShaderModule GetVertexShaderModule() const { return m_VertexShaderModule_; }
+    VkShaderModule GetFragmentShaderModule() const { return m_FragmentShaderModule_; }
 
     private:
         std::string ReadFile(const std::string& filepath);
@@ -40,8 +40,8 @@ namespace NK {
 
 
 	private:  
-        VkShaderModule* m_VertexShaderModule_ = nullptr;
-        VkShaderModule* m_FragmentShaderModule_ = nullptr;
+        VkShaderModule m_VertexShaderModule_ = nullptr;
+        VkShaderModule m_FragmentShaderModule_ = nullptr;
 
         std::string m_FilePath_ = "/home/pingvinus/prog/game_eng/Renderer";
         std::string m_Name_;

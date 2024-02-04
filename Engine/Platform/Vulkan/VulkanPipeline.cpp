@@ -48,13 +48,14 @@ namespace NK
         VulkanRenderBackend* vkRenderBackend = VulkanRenderBackend::s_vkRenderBackend_;
         CreatePipelineLayout(vkRenderBackendContext->globalDescriptorSetLayout);
         CreatePipelineConfigInfo(vkRenderBackend->GetSwapChainRenderPass());
+
         CreateGraphicsPipeline(m_ShaderModule_, m_ConfigInfo_);
     }
 
 
     void VulkanPipeline::Bind() 
     {
-        NK_CORE_ASSERT(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer == nullptr, "Current Command Buffer is nullptr! Unable to bind pipeline!");
+        NK_CORE_ASSERT(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer != nullptr, "Current Command Buffer is nullptr! Unable to bind pipeline!");
         Bind(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer);
     }
 
@@ -212,7 +213,7 @@ namespace NK
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());;
         vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-        vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+        vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();        
 
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

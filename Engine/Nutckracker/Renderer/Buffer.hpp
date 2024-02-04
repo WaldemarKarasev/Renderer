@@ -69,7 +69,7 @@ namespace NK {
 		std::vector<Vertex> m_Vertices_{};
 		std::vector<uint32_t> m_Indices_{};
 		
-		void buildModel(float* vertices, uint32_t v_size, float* indices, uint32_t i_size = 0);
+		void buildModel(float* vertices, uint32_t v_size, uint32_t* indices, uint32_t i_size = 0);
 		void loadModel(const std::string& filepath) { /*empty inplementation*/ }
 	};
 	

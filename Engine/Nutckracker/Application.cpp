@@ -54,6 +54,7 @@ namespace NK {
 		// If we want to stop at stage of compiling shaders source code to SPIR-V format without creating shader module. We need to cached out current shader state.
 		// That means We need to compile shader and wait for contex creation. This possible could be usefulfor Graphics API changing at runtime. 
 		Shader* ObjectShader = Shader::Create("Cube Shader", VulkanVertexShader, VulkanFragmentShader);
+		ObjectRenderSystem* ObjectSystem = ObjectRenderSystem::CreateObjectRenderSystem(ObjectShader);
 
 		// Creating Pipeline. For its initialization Pipeline is using Graphic API context, which should be already inited at this stage of proram.
 
@@ -62,16 +63,17 @@ namespace NK {
 		Shader* LightShader = Shader::Create("Light Shader", VulkanPointLightVertexShader, VulkanPointLightFragmentFragmentShader);
 
 		LightRenderSystem* LightSystem = LightRenderSystem::CreateLightSystem(LightShader);
-		ObjectRenderSystem* ObjectSystem = ObjectRenderSystem::CreateObjectRenderSystem(ObjectShader);
 
-		m_Renderer_->AddRenderSystem(LightSystem);
 		m_Renderer_->AddRenderSystem(ObjectSystem);
+		m_Renderer_->AddRenderSystem(LightSystem);
 	}
 
 	void Application::FillGameObjects()
 	{
 		// TODO: proper realization
 		Builder builder;
+
+		builder.buildModel(squareVertices, sizeof(squareVertices), squareIndices, sizeof(squareIndices));
 		//builder.buildModel(...);
 		//builder.buildModel(ve)
 		std::shared_ptr<Model> model;
@@ -114,6 +116,7 @@ namespace NK {
 	void Application::Run()
 	{	
 		auto currentTime = std::chrono::high_resolution_clock::now();
+		
 		while (m_Running_) 
 		{
 			auto newTime = std::chrono::high_resolution_clock::now();
@@ -130,6 +133,7 @@ namespace NK {
 			m_Renderer_->BeginScene();
 			if (m_Renderer_->BeginFrame())
 			{
+				//int frameIndex = m_Renderer_->;
 				int frameIndex;
 				FrameInfo frameInfo{
 					frameIndex,
@@ -143,7 +147,7 @@ namespace NK {
 				ubo.view = m_Camera_.GetViewMatrix();
 				ubo.inverseView = m_Camera_.GetInverseViewMatrix();
 
-				m_Renderer_->FrameProcessing(frameInfo, ubo);
+				m_Renderer_->FrameProcessing(frameInfo, ubo); // selecting current frameIndex etc.
 				m_Renderer_->BeginRendering();
 				m_Renderer_->ProcessRenderingSystems(frameInfo);
 				m_Renderer_->EndRendering();

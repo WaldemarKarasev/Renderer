@@ -9,26 +9,26 @@
 
 namespace NK {
 
-    template <typename T, typename... Rest>
-    void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
-    {
-        //seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed << 9) + (seed >> 2);
-        (hashCombine(seed, rest), ...);
-    };
+    //template <typename T, typename... Rest>
+    //void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
+    //{
+    //    //seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed << 9) + (seed >> 2);
+    //    (hashCombine(seed, rest), ...);
+    //};
 }
 
 namespace std
 {
-    template<>
-    struct hash<NK::Vertex>
-    {
-        size_t operator()(NK::Vertex const& vertex) const
-        {
-            size_t seed = 0;
-            NK::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
-            return seed;
-        }
-    };
+    //template<>
+    //struct hash<NK::Vertex>
+    //{
+    //    size_t operator()(NK::Vertex const& vertex) const
+    //    {
+    //        size_t seed = 0;
+    //        NK::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+    //        return seed;
+    //    }
+    //};
 }
 
 namespace NK {
@@ -71,7 +71,7 @@ namespace NK {
 	}
 
 
-	void Builder::buildModel(float* vertices, uint32_t v_size, float* indices, uint32_t i_size)
+	void Builder::buildModel(float* vertices, uint32_t v_size, uint32_t* indices, uint32_t i_size)
 	{
 		NK_CORE_ASSERT(v_size % sizeof(Vertex) == 0, "Data doesn't alligned with Vertex layout!");
 
@@ -84,15 +84,17 @@ namespace NK {
 			vertex.position = glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);
 			vertex.color = glm::vec3(vertices[i + 3], vertices[i + 4], vertices[i + 5]);
 			vertex.normal = glm::vec3(vertices[i + 6], vertices[i + 7], vertices[i + 8]);
+			//vertex.uv = glm::vec2(vertices[i + 9], vertices[i + 10]);
 			vertex.uv = glm::vec2(vertices[i + 9], vertices[i + 10]);
-			if (i == 0)
+			//NK_CORE_TRACE("vertices[i + 9] = {0}, vertices[i + 10] = {1}", vertices[i + 9], vertices[i + 10]);
+			if (i == 0 || i == 1 || i == 2)
 			{
 				NK_CORE_INFO("=======TRACING VERTEX CREATION=======");
 				NK_CORE_TRACE("=============== START ===============");
-				//NK_CORE_TRACE("vertex.position = {1}, {2}, {3}", vertex.position.x, vertex.position.y, vertex.position.z);
-				//NK_CORE_TRACE("vertex.color = {1}, {2}, {3}", vertex.color.x, vertex.color.y, vertex.color.z);
-				//NK_CORE_TRACE("vertex.normal = {1}, {2}, {3}", vertex.normal.x, vertex.normal.y, vertex.normal.z);
-				//NK_CORE_TRACE("vertex.uv = {1}, {2}", vertex.position.x, vertex.position.y);
+				NK_CORE_TRACE("vertex.position = {0}, {1}, {2}", vertex.position.x, vertex.position.y, vertex.position.z);
+				NK_CORE_TRACE("vertex.color = {0}, {1}, {2}", vertex.color.x, vertex.color.y, vertex.color.z);
+				NK_CORE_TRACE("vertex.normal = {0}, {1}, {2}", vertex.normal.x, vertex.normal.y, vertex.normal.z);
+				NK_CORE_TRACE("vertex.uv = {0}, {1}", vertex.position.x, vertex.position.y);
 				NK_CORE_TRACE("================ END ================");
 			}
 

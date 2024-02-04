@@ -8,44 +8,44 @@
 
 // Vertices and Indices
 
-float squareVertices[8 * 24] = {
-    //    position             normal            UV                  index
+float squareVertices[11 * 24] = {
+    //    position             color               normal              UV                  index
 
     // FRONT
-    -1.0f, -1.f, -1.f,    -1.f,  0.f,  0.f,     0.f, 0.f,              // 0
-    -1.0f,  1.f, -1.f,    -1.f,  0.f,  0.f,     1.f, 0.f,              // 1
-    -1.0f,  1.f,  1.f,    -1.f,  0.f,  0.f,     1.f, 1.f,              // 2
-    -1.0f, -1.f,  1.f,    -1.f,  0.f,  0.f,     0.f, 1.f,              // 3
+    -1.0f, -1.f, -1.f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     0.f, 0.f,              // 0
+    -1.0f,  1.f, -1.f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     1.f, 0.f,              // 1
+    -1.0f,  1.f,  1.f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     1.f, 1.f,              // 2
+    -1.0f, -1.f,  1.f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     0.f, 1.f,              // 3
 
     // BACK                                  
-    1.0f, -1.f, -1.f,     1.f,  0.f,  0.f,     1.f, 0.f,              // 4
-    1.0f,  1.f, -1.f,     1.f,  0.f,  0.f,     0.f, 0.f,              // 5
-    1.0f,  1.f,  1.f,     1.f,  0.f,  0.f,     0.f, 1.f,              // 6
-    1.0f, -1.f,  1.f,     1.f,  0.f,  0.f,     1.f, 1.f,              // 7
+    1.0f, -1.f, -1.f,     1.f,  0.f,  0.f,     1.f,  0.f,  0.f,     1.f, 0.f,              // 4
+    1.0f,  1.f, -1.f,     1.f,  0.f,  0.f,     1.f,  0.f,  0.f,     0.f, 0.f,              // 5
+    1.0f,  1.f,  1.f,     1.f,  0.f,  0.f,     1.f,  0.f,  0.f,     0.f, 1.f,              // 6
+    1.0f, -1.f,  1.f,     1.f,  0.f,  0.f,     1.f,  0.f,  0.f,     1.f, 1.f,              // 7
 
     // RIGHT
-    -1.0f,  1.f, -1.f,    0.f,  1.f,  0.f,     0.f, 0.f,              // 8
-    1.0f,  1.f, -1.f,     0.f,  1.f,  0.f,     1.f, 0.f,              // 9
-    1.0f,  1.f,  1.f,     0.f,  1.f,  0.f,     1.f, 1.f,              // 10
-    -1.0f,  1.f,  1.f,    0.f,  1.f,  0.f,     0.f, 1.f,              // 11
+    -1.0f,  1.f, -1.f,    1.f,  0.f,  0.f,     0.f,  1.f,  0.f,     0.f, 0.f,              // 8
+    1.0f,  1.f, -1.f,     1.f,  0.f,  0.f,     0.f,  1.f,  0.f,     1.f, 0.f,              // 9
+    1.0f,  1.f,  1.f,     1.f,  0.f,  0.f,     0.f,  1.f,  0.f,     1.f, 1.f,              // 10
+    -1.0f,  1.f,  1.f,    1.f,  0.f,  0.f,     0.f,  1.f,  0.f,     0.f, 1.f,              // 11
 
     // LEFT
-    -1.0f, -1.f, -1.f,    0.f, -1.f,  0.f,     1.f, 0.f,              // 12
-    1.0f, -1.f, -1.f,     0.f, -1.f,  0.f,     0.f, 0.f,              // 13
-    1.0f, -1.f,  1.f,     0.f, -1.f,  0.f,     0.f, 1.f,              // 14
-    -1.0f, -1.f,  1.f,    0.f, -1.f,  0.f,     1.f, 1.f,              // 15
+    -1.0f, -1.f, -1.f,    1.f,  0.f,  0.f,     0.f, -1.f,  0.f,     1.f, 0.f,              // 12
+    1.0f, -1.f, -1.f,     1.f,  0.f,  0.f,     0.f, -1.f,  0.f,     0.f, 0.f,              // 13
+    1.0f, -1.f,  1.f,     1.f,  0.f,  0.f,     0.f, -1.f,  0.f,     0.f, 1.f,              // 14
+    -1.0f, -1.f,  1.f,    1.f,  0.f,  0.f,     0.f, -1.f,  0.f,     1.f, 1.f,              // 15
 
     // TOP
-    -1.0f, -1.f,  1.f,    0.f,  0.f,  1.f,     0.f, 0.f,              // 16
-    -1.0f,  1.f,  1.f,    0.f,  0.f,  1.f,     1.f, 0.f,              // 17
-    1.0f,  1.f,  1.f,     0.f,  0.f,  1.f,     1.f, 1.f,              // 18
-    1.0f, -1.f,  1.f,     0.f,  0.f,  1.f,     0.f, 1.f,              // 19
+    -1.0f, -1.f,  1.f,    1.f,  0.f,  0.f,     0.f,  0.f,  1.f,     0.f, 0.f,              // 16
+    -1.0f,  1.f,  1.f,    1.f,  0.f,  0.f,     0.f,  0.f,  1.f,     1.f, 0.f,              // 17
+    1.0f,  1.f,  1.f,     1.f,  0.f,  0.f,     0.f,  0.f,  1.f,     1.f, 1.f,              // 18
+    1.0f, -1.f,  1.f,     1.f,  0.f,  0.f,     0.f,  0.f,  1.f,     0.f, 1.f,              // 19
 
     // BOTTOM
-    -1.0f, -1.f, -1.f,   0.f,  0.f, -1.f,     0.f, 1.f,              // 20
-    -1.0f,  1.f, -1.f,   0.f,  0.f, -1.f,     1.f, 1.f,              // 21
-    1.0f,  1.f, -1.f,    0.f,  0.f, -1.f,     1.f, 0.f,              // 22
-    1.0f, -1.f, -1.f,    0.f,  0.f, -1.f,     0.f, 0.f,              // 23
+    -1.0f, -1.f, -1.f,   1.f,  0.f,  0.f,      0.f,  0.f, -1.f,     0.f, 1.f,              // 20
+    -1.0f,  1.f, -1.f,   1.f,  0.f,  0.f,      0.f,  0.f, -1.f,     1.f, 1.f,              // 21
+    1.0f,  1.f, -1.f,    1.f,  0.f,  0.f,      0.f,  0.f, -1.f,     1.f, 0.f,              // 22
+    1.0f, -1.f, -1.f,    1.f,  0.f,  0.f,      0.f,  0.f, -1.f,     0.f, 0.f,              // 23
 };	
 
 uint32_t squareIndices[6 * 6] = { 	
@@ -254,26 +254,17 @@ std::string VulkanVertexShader = R"(
     int numLights;
     } ubo;
 
-    layout(set = 1, binding = 0) uniform GlobalUbo1 {
-    mat4 projection;
-    mat4 view;
-    mat4 invView;
-    vec4 ambientLightColor; // w is intensity
-    PointLight pointLights[10];
-    int numLights;
-    } ubo1;
-
     layout(push_constant) uniform Push {
     mat4 modelMatrix;
     mat4 normalMatrix;
     } push;
 
     void main() {
-    vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
-    gl_Position = ubo.projection * ubo.view * positionWorld;
-    fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
-    fragPosWorld = positionWorld.xyz;
-    fragColor = color;
+        vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
+        gl_Position = ubo.projection * ubo.view * positionWorld;
+        fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
+        fragPosWorld = positionWorld.xyz;
+        fragColor = color;
     }
 
 )";
@@ -302,15 +293,6 @@ std::string VulkanFragmentShader = R"(
     PointLight pointLights[10];
     int numLights;
     } ubo;
-
-    //layout(set = 1, binding = 0) uniform GlobalUbo1 {
-    //  mat4 projection;
-    //  mat4 view;
-    //  mat4 invView;
-    //  vec4 ambientLightColor; // w is intensity
-    //  PointLight pointLights[10];
-    //  int numLights;
-    //} ubo1;
 
     layout(push_constant) uniform Push {
     mat4 modelMatrix;

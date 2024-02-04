@@ -119,6 +119,9 @@ namespace NK {
 	: m_Name_(name)
 	{
 		NK_TRACE("shader name: {0}", name);
+		//NK_TRACE("shader vertexSrc: {0}", vertexSrc);
+		//NK_TRACE("shader fragmentSrc: {0}", fragmentSrc);
+		
 		std::unordered_map<uint32_t, std::string> sources;
 		sources[VK_SHADER_STAGE_VERTEX_BIT] = vertexSrc;
 		sources[VK_SHADER_STAGE_FRAGMENT_BIT] = fragmentSrc;
@@ -203,7 +206,8 @@ namespace NK {
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
-		const bool optimize = true;
+		const bool optimize = false;
+		//const bool optimize = true;
 
 		if (optimize)
 		{
@@ -218,8 +222,8 @@ namespace NK {
 			std::experimental::filesystem::path shaderFilePath = m_FilePath_;
 			std::experimental::filesystem::path cachedPath = cachedDiretory / (shaderFilePath.filename().string() + detail::GLShaderStageCachedVulkanFileExtension(stage));
 
-			NK_CORE_TRACE("shaderFilePath - {0}", shaderFilePath.string());
-			NK_CORE_TRACE("cachedPath - {0}", cachedPath.string());
+			//NK_CORE_TRACE("shaderFilePath - {0}", shaderFilePath.string());
+			//NK_CORE_TRACE("cachedPath - {0}", cachedPath.string());
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open())
@@ -265,13 +269,16 @@ namespace NK {
 	
 	void VulkanShader::CreateShaderModule()
 	{
+
+		NK_CORE_TRACE("{0}", m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].size());
+		NK_CORE_TRACE("{0}", m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].size());
 		// Creating m_VertexShaderModule_	
 		VkShaderModuleCreateInfo vertexCreateInfo{};
         vertexCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        vertexCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].size();
+        vertexCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].size()*4;
         vertexCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_VulkanSPIRV_[VK_SHADER_STAGE_VERTEX_BIT].data());
 
-        if(vkCreateShaderModule(vkContext.device, &vertexCreateInfo, nullptr, m_VertexShaderModule_) != VK_SUCCESS)
+        if(vkCreateShaderModule(vkContext.device, &vertexCreateInfo, nullptr, &m_VertexShaderModule_) != VK_SUCCESS)
         { 
 			NK_CORE_ERROR("Vertex ShaderModule creation failure!");
 			NK_CORE_ASSERT(false, "Failed to create vertex shader module");
@@ -280,10 +287,10 @@ namespace NK {
 		// Creating m_FragmentShaderModule_
 		VkShaderModuleCreateInfo fragmentCreateInfo{};
         fragmentCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        fragmentCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].size();
+        fragmentCreateInfo.codeSize = m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].size()*4;
         fragmentCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_VulkanSPIRV_[VK_SHADER_STAGE_FRAGMENT_BIT].data());
 
-        if(vkCreateShaderModule(vkContext.device, &fragmentCreateInfo, nullptr, m_FragmentShaderModule_) != VK_SUCCESS)
+        if(vkCreateShaderModule(vkContext.device, &fragmentCreateInfo, nullptr, &m_FragmentShaderModule_) != VK_SUCCESS)
         { 
             throw std::runtime_error("failed to create shader module");
         }

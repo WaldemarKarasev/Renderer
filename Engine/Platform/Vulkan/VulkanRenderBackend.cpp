@@ -8,8 +8,8 @@
 namespace NK {
 
     // Zero initialization of Vukan context.
-    VulkanRenderBackendContext* VulkanRenderBackend::s_vkRenderBackendContext_ = nullptr;
-    VulkanCurrentFrameContext*  VulkanRenderBackend::s_vkCurrentFrameContext_ = nullptr;
+    VulkanRenderBackendContext* VulkanRenderBackend::s_vkRenderBackendContext_ = new VulkanRenderBackendContext();
+    VulkanCurrentFrameContext*  VulkanRenderBackend::s_vkCurrentFrameContext_ = new VulkanCurrentFrameContext();
     VulkanRenderBackend*        VulkanRenderBackend::s_vkRenderBackend_ = nullptr;
 
 	void VulkanRenderBackend::Init(Window* window)
@@ -31,7 +31,8 @@ namespace NK {
 
         // Initialization of RenderBackend Vulkan Global context
         //s_vkRenderBackendContext_.NK_Device = m_Device_;
-        s_vkRenderBackendContext_->descriptorSets = m_DescriptorSets_;
+        NK_CORE_TRACE("{0}", m_GlobalDescriptorSets_.size());
+        s_vkRenderBackendContext_->descriptorSets = m_GlobalDescriptorSets_;
         s_vkRenderBackendContext_->globalDescriptorSetLayout = m_GlobalSetLayout_->getDescriptorSetLayout();
 
         // Initialization of RenderBackend Vulkan Current Frame context
@@ -97,7 +98,8 @@ namespace NK {
 
     bool VulkanRenderBackend::BeginFrame()
     {   
-        if (m_CurrCommandBuffer_ = VKBeginFrame())
+        m_CurrCommandBuffer_ = VKBeginFrame();
+        if (m_CurrCommandBuffer_ != nullptr)
         {
             m_IsFrameStarted_ = true;
             s_vkCurrentFrameContext_->CurrentCommandBuffer = m_CurrCommandBuffer_;
@@ -185,7 +187,7 @@ namespace NK {
             m_Window_->WaitEvents();//glfwWaitEvents();
         }
                     
-        vkDeviceWaitIdle(m_Device_->device());
+        vkDeviceWaitIdle(vkContext.device);
 
         if(m_SwapChain_ == nullptr)
         {
@@ -214,7 +216,7 @@ namespace NK {
         allocInfo.commandPool = m_Device_->getCommandPool();
         allocInfo.commandBufferCount = static_cast<uint32_t>(m_CommandBuffer_.size());
 
-        if (vkAllocateCommandBuffers(m_Device_->device(), &allocInfo, m_CommandBuffer_.data()) !=
+        if (vkAllocateCommandBuffers(vkContext.device, &allocInfo, m_CommandBuffer_.data()) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");
         }
@@ -263,63 +265,91 @@ namespace NK {
         {
             throw std::runtime_error("failed to beginFrame() recording command buffer!");
         }   
-
         return commandBuffer;
     }
 
-    int  VulkanRenderBackend::GetFrameIndex()
+    int VulkanRenderBackend::GetFrameIndex()
     {
+        NK_CORE_ASSERT(m_IsFrameStarted_,"Cannot get current frame when frame is not in progress!");
+        return m_currentFrameIndex_;
 
     }
     void VulkanRenderBackend::BeginSwapChainRenderPass(VkCommandBuffer commandBuffer)
     {
+        NK_CORE_ASSERT(m_IsFrameStarted_,"Can't call beginSwapChainRenderPass() while already in progress!");
+        NK_CORE_ASSERT(commandBuffer == GetCurrentCommandBuffer(), "commandBuffer == getCurrentCommandBuffer(). Can't begin render pass on command buffer from a different frame!");
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = m_SwapChain_->getRenderPass();
+        renderPassInfo.framebuffer = m_SwapChain_->getFrameBuffer(m_CurrentImageIndex_);
 
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = m_SwapChain_->getSwapChainExtent();
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+        clearValues[1].depthStencil = {1.0f, 0};
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(m_SwapChain_->getSwapChainExtent().width);
+        viewport.height = static_cast<float>(m_SwapChain_->getSwapChainExtent().height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        VkRect2D scissor{{0, 0}, m_SwapChain_->getSwapChainExtent()};
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
     }
     void VulkanRenderBackend::EndSwapChainRenderPass(VkCommandBuffer commandBuffer)
     {
+        NK_CORE_ASSERT(m_IsFrameStarted_, "Can't call endSwapChainRenderPass() while already in progress!");
+        NK_CORE_ASSERT(commandBuffer == GetCurrentCommandBuffer(), "Can't end render pass on command buffer from a different frame!");
+
+        vkCmdEndRenderPass(commandBuffer);
 
     }
     void VulkanRenderBackend::VKEndFrame()
     {
+        NK_CORE_ASSERT(m_IsFrameStarted_, "Can't call endFrame() while already in progress!");
+        auto commandBuffer = GetCurrentCommandBuffer();
+        
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) 
+        {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+
+        auto result = m_SwapChain_->submitCommandBuffers(&commandBuffer, &m_CurrentImageIndex_);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR )//m_Window_->wasWindowResized())
+        {
+            //.resetWindowResizedFlag();
+            RecreateSwapChain();
+        }
+        else if (result != VK_SUCCESS) 
+        {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        m_IsFrameStarted_ = false;
+        m_currentFrameIndex_ = (m_currentFrameIndex_ + 1) % VulkanSwapChain::MAX_FRAMES_IN_FLIGHT;
 
     }
-
-    #if 0
-    int VulkanRenderBackend::getFrameIndex()
-    {
-
-    }
-    
-    void VulkanRenderBackend::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
-    {
-
-    }
-    
-    void VulkanRenderBackend::endSwapChainRenderPass(VkCommandBuffer commandBuffer)
-    {
-
-    }
-    
-    void VulkanRenderBackend::endFrame()
-    {
-
-    }
-    #endif
-
 
     void VulkanRenderBackend::InitGlobalDescroptorSets()
     {
-        NK_CORE_TRACE("111111");
         m_GlobalPool_ =  
         VulkanDescriptorPool::Builder()
         .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 
-        NK_CORE_TRACE("222222222");
         //std::vector<std::unique_ptr<VulkanBuffer>> uboBuffers(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
-        m_UboBuffers_.reserve(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
+        //m_UboBuffers_.reserve(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
         for(size_t i = 0; i < m_UboBuffers_.size(); ++i)
         {
@@ -340,7 +370,7 @@ namespace NK {
             .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
             .build();
 
-        m_GlobalDescriptorSets_.reserve(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
+        //m_GlobalDescriptorSets_.reserve(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < m_GlobalDescriptorSets_.size(); ++i)
         {
             auto bufferInfo = m_UboBuffers_[i]->descriptorInfo();
