@@ -40,7 +40,17 @@ namespace NK {
 
     void VulkanModel::Draw() const
     {
-
+        vkCmdDraw(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, 3, 1, 0, 0); // if draw multiple times it is causes artefacts in model (I spotted this in the 3D model, not a 2D cube) drawings
+        #if 0
+        if(m_HasIndexBuffer_)
+        {
+            vkCmdDrawIndexed(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, m_IndexCount_, 1, 0, 0, 0);
+        }
+        else
+        {
+            vkCmdDraw(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, m_VertexCount_, 1, 0, 0);
+        }
+        #endif
     }
 
     void VulkanModel::BuildModel(const Builder& builder) 
