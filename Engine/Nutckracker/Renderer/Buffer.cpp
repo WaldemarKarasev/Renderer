@@ -77,17 +77,19 @@ namespace NK {
 
 		m_Vertices_.clear();
 		m_Indices_.clear();
-
+		
+		NK_CORE_INFO("=======TRACING VERTEX CREATION=======");
+		NK_CORE_TRACE("=============== START ===============");
 		for (size_t i = 0; i < v_size / sizeof(Vertex); ++i)
 		{
 			Vertex vertex;
-			vertex.position = glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);
-			vertex.color = glm::vec3(vertices[i + 3], vertices[i + 4], vertices[i + 5]);
-			vertex.normal = glm::vec3(vertices[i + 6], vertices[i + 7], vertices[i + 8]);
-			//vertex.uv = glm::vec2(vertices[i + 9], vertices[i + 10]);
-			vertex.uv = glm::vec2(vertices[i + 9], vertices[i + 10]);
-			//NK_CORE_TRACE("vertices[i + 9] = {0}, vertices[i + 10] = {1}", vertices[i + 9], vertices[i + 10]);
-			if (i == 0 || i == 1 || i == 2)
+			size_t offset = sizeof(Vertex)/sizeof(float) * i;
+			vertex.position = glm::vec3(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+			vertex.color    = glm::vec3(vertices[offset + 3], vertices[offset + 4], vertices[offset + 5]);
+			vertex.normal   = glm::vec3(vertices[offset + 6], vertices[offset + 7], vertices[offset + 8]);
+			vertex.uv 		= glm::vec2(vertices[offset + 9], vertices[offset + 10]);
+			NK_CORE_TRACE("vertices[i + 9] = {0}, vertices[i + 10] = {1}", vertices[i + 9], vertices[i + 10]);
+			if (i == 0 || i == 1 || i == 2 && 0)
 			{
 				NK_CORE_INFO("=======TRACING VERTEX CREATION=======");
 				NK_CORE_TRACE("=============== START ===============");
@@ -100,6 +102,7 @@ namespace NK {
 
 			m_Vertices_.push_back(vertex);
 		}
+		NK_CORE_TRACE("================ END ================");
 
 		if (i_size == 0)
 		{

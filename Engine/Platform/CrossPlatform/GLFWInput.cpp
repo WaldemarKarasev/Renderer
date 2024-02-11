@@ -1,5 +1,5 @@
 #include "nkpch.h"
-#include "GLFWInput.h"
+#include "GLFWInput.hpp"
 
 #include "Nutckracker/Application.hpp"
 #include <GLFW/glfw3.h>
@@ -13,6 +13,13 @@ namespace NK {
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keycode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
+	}
+
+	bool GLFWInput::IsKeyReleasedImpl(int keycode)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		auto state = glfwGetKey(window, keycode);
+		return state == GLFW_RELEASE;
 	}
 
 	bool GLFWInput::IsMouseButtonPressedImpl(int button)

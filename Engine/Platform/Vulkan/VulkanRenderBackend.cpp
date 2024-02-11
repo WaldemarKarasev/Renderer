@@ -142,7 +142,7 @@ namespace NK {
 
         // Rendering Lights
         std::for_each(m_LightRenderSystems_.begin(), m_LightRenderSystems_.end(), [&frameInfo](const LightRenderSystem* renderSystem){
-            renderSystem->Render(frameInfo);
+            //renderSystem->Render(frameInfo);
         });
     }
 

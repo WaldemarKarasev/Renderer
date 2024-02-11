@@ -63,9 +63,9 @@ namespace NK
             if(obj.m_PointLight_ == nullptr) continue;
 
             // calculate distance
-            auto offset = frameInfo.camera.GetPosition() - obj.m_transform_.translation;
-            float disSquared = glm::dot(offset, offset);
-            sorted[disSquared] = obj.GetId();
+            //auto offset = frameInfo.camera.GetPosition() - obj.m_transform_.translation;
+            //float disSquared = glm::dot(offset, offset);
+            //sorted[disSquared] = obj.GetId();
         }
         
 

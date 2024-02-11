@@ -35,13 +35,13 @@ namespace NK {
 
     void VulkanModel::Unbind() const
     {
-
+        // Empty implementation
     }
 
     void VulkanModel::Draw() const
     {
-        vkCmdDraw(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, 3, 1, 0, 0); // if draw multiple times it is causes artefacts in model (I spotted this in the 3D model, not a 2D cube) drawings
-        #if 0
+        //vkCmdDraw(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, 3, 1, 0, 0); // if draw multiple times it is causes artefacts in model (I spotted this in the 3D model, not a 2D cube) drawings
+        #if 1
         if(m_HasIndexBuffer_)
         {
             vkCmdDrawIndexed(VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer, m_IndexCount_, 1, 0, 0, 0);

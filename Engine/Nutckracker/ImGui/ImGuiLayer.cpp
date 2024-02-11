@@ -71,13 +71,16 @@ namespace NK {
 
     void ImGuiLayer::Begin() 
     {
+		#if 0
         ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		#endif
     }
 
     void ImGuiLayer::End()
     {
+		#if 0
         ImGuiIO& io = ImGui::GetIO();
 
         Application& app = Application::Get();
@@ -94,6 +97,7 @@ namespace NK {
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
+		#endif
     }
 
     void ImGuiLayer::OnImGuiRender()

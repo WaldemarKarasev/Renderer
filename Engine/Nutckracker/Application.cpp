@@ -8,7 +8,7 @@
 #include "Nutckracker/Renderer/Renderer.hpp"
 #include "Nutckracker/Renderer/RenderSystem.hpp"
 
-#include "Input.h"
+#include "Input.hpp"
 
 #include "Nutckracker/Log.h"
 
@@ -19,7 +19,7 @@
 
 namespace NK {
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+//#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance_ = nullptr;
 
@@ -29,7 +29,7 @@ namespace NK {
 		s_Instance_ = this;
 		
 		m_Window_ = Window::Create();
-		m_Window_->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window_->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		// TODO: vulkan implementation
 		#if 0
@@ -73,9 +73,12 @@ namespace NK {
 		// TODO: proper realization
 		Builder builder;
 
-		builder.buildModel(squareVertices, sizeof(squareVertices), squareIndices, sizeof(squareIndices));
-		//builder.buildModel(...);
-		//builder.buildModel(ve)
+		//builder.buildModel(squareVertices, sizeof(squareVertices), squareIndices, sizeof(squareIndices));
+		NK_CORE_ERROR("sizeof(squareVertices) = {0}", sizeof(squareVertices));
+		NK_CORE_ERROR("sizeof(squareIndices)  = {0}", sizeof(squareIndices));
+		
+		builder.buildModel(squareVertices, sizeof(squareVertices), squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
+		
 		std::shared_ptr<Model> model;
 		model.reset(Model::Create(builder));
 
@@ -101,8 +104,8 @@ namespace NK {
 	{
 		EventDispatcher dispatcher(e);
 
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResized));
 
 
 		for (auto it = m_LayerStack_.end(); it != m_LayerStack_.begin();)
@@ -116,36 +119,29 @@ namespace NK {
 	void Application::Run()
 	{	
 		auto currentTime = std::chrono::high_resolution_clock::now();
-		
+		m_Camera_.SetAspectRatio(m_Renderer_->GetAspectRatio());
 		while (m_Running_) 
 		{
 			auto newTime = std::chrono::high_resolution_clock::now();
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-			// Updating m_Camera_
-
-			m_Camera_.SetViewYXZ(m_Camera_.GetCameraTranslation(), m_Camera_.GetCameraRotation());
-
-			m_Camera_.SetPerspectiveProjection(glm::radians(50.f), m_Renderer_->GetAspectRatio(), 0.1f, 100.f);
-
-
+			
 			m_Renderer_->BeginScene();
 			if (m_Renderer_->BeginFrame())
 			{
-				//int frameIndex = m_Renderer_->;
 				int frameIndex;
 				FrameInfo frameInfo{
 					frameIndex,
 					frameTime,
-					m_Camera_, // already updated
+					m_Camera_,
 					m_GameObjets_
 				};
 
 				GlobalUbo ubo{};
 				ubo.projection = m_Camera_.GetProjectionMatrix();
 				ubo.view = m_Camera_.GetViewMatrix();
-				ubo.inverseView = m_Camera_.GetInverseViewMatrix();
+				ubo.inverseView = m_Camera_.GetInverseViewMatrix(); // for lighting
 
 				m_Renderer_->FrameProcessing(frameInfo, ubo); // selecting current frameIndex etc.
 				m_Renderer_->BeginRendering();
@@ -155,7 +151,7 @@ namespace NK {
 			}
 			m_Renderer_->EndScene();
 
-			#if 0
+			#if 1
 			for (Layer* layer : m_LayerStack_)
 				layer->OnUpdate();
 
@@ -181,6 +177,7 @@ namespace NK {
 		//NK_CORE_TRACE("Window resized callback");
 		//m_Renderer_->SetViewPort(0, 0, e.GetWidth(), e.GetHeight());
 		//camera.SetViewPortSize(e.GetWidth(), e.GetHeight());
+		m_Camera_.SetAspectRatio(m_Renderer_->GetAspectRatio());
 		return true;
 	}
 }

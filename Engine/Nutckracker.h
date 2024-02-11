@@ -5,8 +5,8 @@
 #include "Nutckracker/Layer.h"
 #include "Nutckracker/Log.h"
 
-#include "Nutckracker/Input.h"
-#include "Nutckracker/KeyCodes.h"
+#include "Nutckracker/Input.hpp"
+#include "Nutckracker/KeyCodes.hpp"
 #include "Nutckracker/MouseButtonCodes.h"
 
 #include "Nutckracker/ImGui/ImGuiLayer.h"

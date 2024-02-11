@@ -43,6 +43,8 @@ namespace NK {
 
 		inline static Application& Get()  { return *s_Instance_; }
 
+		inline Camera* GetCamera() { return &m_Camera_; }
+
 		inline Window& GetWindow() { return *m_Window_; }
 
 	private:
@@ -56,7 +58,7 @@ namespace NK {
 		LayerStack m_LayerStack_;
 
 		// Camera object
-    	Camera m_Camera_{};
+    	Camera m_Camera_{glm::vec3{0.0f, 0.0f, -20.0f}};
 
 		// Renderer
 		// Renderer class is independent from API's (Vulkan or OpenGL)

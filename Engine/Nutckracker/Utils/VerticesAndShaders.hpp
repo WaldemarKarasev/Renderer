@@ -7,7 +7,7 @@
 #include <glm/mat4x4.hpp>
 
 // Vertices and Indices
-
+#if 0
 float squareVertices[11 * 24] = {
     //    position             color               normal              UV                  index
 
@@ -56,7 +56,7 @@ uint32_t squareIndices[6 * 6] = {
     16, 17, 18, 18, 19, 16, // top
     20, 21, 22, 22, 23, 20  // bottom
 };
-
+#endif
 
 // Shaders 
 std::string blueShaderVertexSrc = R"(
@@ -226,7 +226,19 @@ namespace tmp_detail {
 
 
 
+float squareVertices[11 * 4] = {
+    //    position             color               normal              UV                  index
 
+    // FRONT
+     0.5f, -0.5f,  0.0f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     0.f, 0.f,              // 0
+     0.5f,  0.5f,  0.0f,    0.f,  1.f,  0.f,    -1.f,  0.f,  0.f,     1.f, 0.f,              // 1
+    -0.5f,  0.5f,  0.0f,    0.f,  0.f,  1.f,    -1.f,  0.f,  0.f,     1.f, 1.f,              // 2
+    -0.5f, -0.5f,  0.0f,    1.f,  0.f,  0.f,    -1.f,  0.f,  0.f,     1.f, 1.f,              // 3
+};	
+
+uint32_t squareIndices[3 * 2] = { 	
+    0, 1, 2, 2, 3, 0
+};
 
 std::string VulkanVertexShader = R"(
     #version 450
@@ -259,19 +271,12 @@ std::string VulkanVertexShader = R"(
     mat4 normalMatrix;
     } push;
 
-    vec2 positions[3] = vec2[](
-    vec2(0.0, -0.5),
-    vec2(0.5, 0.5),
-    vec2(-0.5, 0.5)
-    );
-
     void main() {
         vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
-        //gl_Position = ubo.projection * ubo.view * positionWorld;
+        gl_Position = ubo.projection * ubo.view * positionWorld;
         fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
         fragPosWorld = positionWorld.xyz;
         fragColor = color;
-        gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
     }
 
 )";
@@ -334,7 +339,10 @@ std::string VulkanFragmentShader = R"(
     }
     
         //outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
-        outColor = vec4(0.8, 0.4, 0.1, 1.0);
+        
+        
+        outColor = vec4(fragColor, 1.0);
+        //outColor = vec4(0.8, 0.4, 0.1, 1.0);
     }
 
 )";

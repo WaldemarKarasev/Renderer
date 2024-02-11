@@ -40,21 +40,8 @@ namespace NK
 
     void SimpleRenderSystem::Render(FrameInfo& frameInfo) const
     {
-        //m_Pipeline_->bind(frameInfo.commandBuffer);
         m_Pipeline_->Bind();
         m_Pipeline_->BindGlobalDescriptors(frameInfo.frameIndex);
-        #if 0
-        vkCmdBindDescriptorSets(
-            VulkanRenderBackend::s_vkCurrentFrameContext_->CurrentCommandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_pipelineLayout_,
-            0, 
-            1,
-            &VulkanRenderBackend::GetVKContext()->GlobalDescriptorSet, 
-            0,
-            nullptr
-        );
-        #endif
 
         for (auto& kv : frameInfo.gameObjects)
         {
@@ -69,15 +56,6 @@ namespace NK
             push.normalMatrix = obj.m_transform_.normalMatrix();
 
             m_Pipeline_->PushPushConstants(push);
-            #if 0            
-            vkCmdPushConstants( 
-                VulkanRenderBackend::GetVKContext()->CurrentCommandBuffer, 
-                m_pipelineLayout_, 
-                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 
-                0, 
-                sizeof(SimplePushConstantData), 
-                &push);
-            #endif
 
             obj.m_Model_->Bind();//obj.m_model_->bind(frameInfo.commandBuffer);
             obj.m_Model_->Draw();//obj.m_model_->draw(frameInfo.commandBuffer);
